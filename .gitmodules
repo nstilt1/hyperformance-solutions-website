@@ -2,3 +2,4 @@
 	path = backend
 	url = https://github.com/nstilt1/hyperformance-solutions-backend
 	branch = master
+	update = none
