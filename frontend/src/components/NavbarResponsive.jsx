@@ -30,16 +30,16 @@ const Navbar = () => {
   const routes = [
     { name: 'Home', href: '/' },
     { 
-      name: 'Mindfulness & Medication', 
-      href: '/mindfulness-medication',
+      name: 'Portfolio', 
+      href: '/portfolio',
       subRoutes: [
-        { name: 'Breathing Guide', href: '/mindfulness-medication/breathing-guide' },
-        { name: 'Medication Tracker', href: '/mindfulness-medication/medication-tracker' }
+        { name: 'Products', href: '/portfolio/products' },
+        { name: 'Projects', href: '/portfolio/projects' },
+        { name: 'Services', href: '/portfolio/services' },
       ]
     },
-    { name: 'Focus', href: '/focus' },
-    { name: 'Mood', href: '/mood' },
-    { name: 'Resources', href: '/resources' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   const toggleMenu = () => {

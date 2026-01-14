@@ -3,7 +3,6 @@
 
 import React, { useEffect, useState } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import CloudBackground from "@/components/CloudBackground";
 import ImageCard from "@/components/ImageCard";
 
 const Dashboard = () => {
@@ -69,8 +68,6 @@ const Dashboard = () => {
 
   return (
     <>
-    <CloudBackground />
-
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-8 sm:pt-10 pb-16 sm:pb-20">
       <h1 className="text-4xl font-bold tracking-tight mt-2 pb-5">Welcome back, {isLoaded ? (name ?? "boss") : ""}!</h1>
       <div className="pb-5">
