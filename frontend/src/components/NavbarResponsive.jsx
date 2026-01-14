@@ -101,65 +101,6 @@ const Navbar = () => {
             </div>
         </div>
 
-        {/* Profile Icon */}
-        <div className="z-50">
-          <button
-            onClick={() => {
-              setTempName(name ?? "");
-              setNicknameOpen(true);
-            }}
-            className="p-2 rounded-full hover:bg-gray-200 transition"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-700"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                    d="M5.121 17.804A9 9 0 1118.88 17.804M12 7a3 3 0 110-6 3 3 0 010 6z" />
-            </svg>
-          </button>
-        </div>
-        <Dialog open={nicknameOpen} onOpenChange={setNicknameOpen}>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle>Your Nickname</DialogTitle>
-              <DialogDescription>
-                Enter a nickname you&apos;d like the app to use when addressing you.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-4 mt-3">
-              <div className="grid gap-1">
-                <Label htmlFor="nickname">Nickname</Label>
-                <Input
-                  id="nickname"
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  placeholder="e.g., Boss, Chief..."
-                />
-              </div>
-            </div>
-
-            <DialogFooter className="mt-4">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-
-              <Button
-                onClick={() => {
-                  setName(tempName);
-                  setNicknameOpen(false);
-                }}
-              >
-                Save Nickname
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
         {/* Mobile Menu Button */}
         <div className="md:hidden z-50">
           <button
