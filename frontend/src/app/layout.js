@@ -3,7 +3,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import NavBar from "@/components/NavbarResponsive";
-import { Toaster } from "@/components/ui/sonner";
+import "@/amplify-config";
+import AuthGate from "@/components/AuthGate";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,8 +30,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavBar />
-        {children}
+        <AuthGate>
+            {children}
+        </AuthGate>
       </body>
     </html>
   );

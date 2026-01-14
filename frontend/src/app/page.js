@@ -1,75 +1,17 @@
 // maybe implement the dashboard in `src/app/page.js`
-"use client"
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import ImageCard from "@/components/ImageCard";
-
+import { Amplify } from 'aws-amplify';
+import config from '@/amplifyconfiguration.json';
+Amplify.configure(config);
 const Dashboard = () => {
-  const [medicationData] = useLocalStorage("meds", []);
-  const [tasks] = useLocalStorage("task-list", []);   // Your task list
-  const [moodEntries] = useLocalStorage("moodEntries", []); // Mood tracker entries
-  const [name, setName, isLoaded] = useLocalStorage("nickname", null);
 
-  function getNextDoseText() {
-    if (!medicationData || medicationData.length === 0) return "No meds";
-
-    const overdue = medicationData.filter(m => isOverdue(m));
-    if (overdue.length > 0) return "Now";
-
-    // find next scheduled time that hasn't passed yet
-    const now = new Date();
-
-    const times = medicationData
-      .map(m => {
-        const [h, min] = m.time.split(":").map(Number);
-        const d = new Date(now);
-        d.setHours(h, min, 0, 0);
-        return d;
-      })
-      .filter(t => t >= now);
-
-    if (times.length === 0) return "Tomorrow";
-
-    const next = times.sort((a,b) => a - b)[0];
-
-    return next.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  }
-
-  const unfinishedCount = tasks?.filter(t => !t.done).length ?? 0;
-
-  function getLastMood() {
-    if (!moodEntries || moodEntries.length === 0) return "None";
-
-    const sorted = [...moodEntries].sort(
-      (a,b) => new Date(b.date) - new Date(a.date)
-    );
-
-    return sorted[0].mood;
-  }
-
-  const isOverdue = (medication) => {
-    if (!medication.time || medication.lastTaken) return false;
-
-    const now = new Date();
-    const [hour, minute] = medication.time.split(":").map(Number);
-    const scheduledTime = new Date(now);
-    scheduledTime.setHours(hour, minute, 0, 0);
-
-    const lastTaken = new Date(medication.lastTaken);
-    const hoursSinceTaken = (now - lastTaken) / (1000 * 60 * 60);
-
-    return now > scheduledTime && hoursSinceTaken > 6;
-  }
 
   return (
     <>
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-8 sm:pt-10 pb-16 sm:pb-20">
-      <h1 className="text-4xl font-bold tracking-tight mt-2 pb-5">Welcome back, {isLoaded ? (name ?? "boss") : ""}!</h1>
+      <h1 className="text-4xl font-bold tracking-tight mt-2 pb-5">Welcome back!</h1>
       <div className="pb-5">
         What would you like to do?
       </div>
@@ -114,7 +56,6 @@ const Dashboard = () => {
 
             <div className="p-4">
               <h3 className="font-bold text-lg">Next Dose</h3>
-              <p className="text-gray-700 mt-1">{getNextDoseText()}</p>
             </div>
           </a>
 
@@ -130,7 +71,6 @@ const Dashboard = () => {
 
             <div className="p-4">
               <h3 className="font-bold text-lg">Unfinished Tasks</h3>
-              <p className="text-gray-700 mt-1">{unfinishedCount}</p>
             </div>
           </a>
 
@@ -146,7 +86,6 @@ const Dashboard = () => {
 
             <div className="p-4">
               <h3 className="font-bold text-lg">Last Mood</h3>
-              <p className="text-gray-700 mt-1">{getLastMood()}</p>
             </div>
           </a>
         </div>
