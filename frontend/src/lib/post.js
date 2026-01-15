@@ -2,9 +2,16 @@
 
 import { Auth } from "aws-amplify";
 
+function decodeJwt(jwt) {
+  const [, payload] = jwt.split(".");
+  const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+  return JSON.parse(json);
+}
+
 export async function postToApi(url, payload) {
   const session = await Auth.currentSession();
   const accessToken = session.getAccessToken().getJwtToken();
+  console.log("access claims", decodeJwt(access));
 
   if (!accessToken) {
     throw new Error("No access token available (user not signed in?)");
