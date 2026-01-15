@@ -1,17 +1,16 @@
-"use client"
+import { CONTENT } from "@/src/lib/contentRegistry";
+import PortfolioClient from "./portfolioClient";
 
-import React, { useState } from "react";
-import useLocalStorage from "@/hooks/useLocalStorage";
-import BreathingGuide from "@/components/BreathingGuide";
-import MedicationTracker from "@/components/MedicationTracker";
+export const dynamic = "error";
+export const revalidate = false;
 
-const MindfulnessAndMedication = () => {
-  return (
-    <>
-        <BreathingGuide />
-        <MedicationTracker />
-    </>
-  );
-};
+export default function PortfolioPage() {
+  // Build-time load all items
+  const products = CONTENT.products.getAll().map((x) => ({ ...x, _type: "products" }));
+  const services = CONTENT.services.getAll().map((x) => ({ ...x, _type: "services" }));
+  const projects = CONTENT.projects.getAll().map((x) => ({ ...x, _type: "projects" }));
 
-export default MindfulnessAndMedication
+  const all = [...products, ...services, ...projects];
+
+  return <PortfolioClient allItems={all} />;
+}
