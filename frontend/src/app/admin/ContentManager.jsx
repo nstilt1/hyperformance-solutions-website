@@ -193,7 +193,7 @@ export default function ContentManager({ initial }) {
       payload[key] = data[key]
     }
 
-    const res = await postToApi("https://yy35luzj4k.execute-api.us-east-1.amazonaws.com/default/update_content", JSON.stringify(payload));
+    const res = await postToApi("https://yy35luzj4k.execute-api.us-east-1.amazonaws.com/default/update_content", payload);
 
     if (!res.ok) {
       const text = await res.text().catch(() => "")
