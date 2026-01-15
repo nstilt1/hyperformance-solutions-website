@@ -17,6 +17,35 @@ import { Separator } from "@/components/ui/separator"
 import TiptapEditor from "@/components/tiptap/TiptapEditor"
 import TiptapPreview from "@/components/tiptap/TiptapPreview"
 
+import { fetchAuthSession } from "aws-amplify/auth";
+
+export async function postToApi(url, payload) {
+  const session = await fetchAuthSession();
+  const accessToken = session?.tokens?.accessToken?.toString(); // JWT string
+
+  if (!accessToken) {
+    throw new Error("No access token available (user not signed in?)");
+  }
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  // Helpful error text
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Request failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ""}`);
+  }
+
+  // If your API returns JSON
+  return await res.json().catch(() => null);
+}
+
 // ---- Helpers ----
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj))
@@ -191,11 +220,7 @@ export default function ContentManager({ initial }) {
       payload[key] = data[key]
     }
 
-    const res = await fetch("https://yy35luzj4k.execute-api.us-east-1.amazonaws.com/default/update_content", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
+    const res = await postToApi("https://yy35luzj4k.execute-api.us-east-1.amazonaws.com/default/update_content", JSON.stringify(payload));
 
     if (!res.ok) {
       const text = await res.text().catch(() => "")
