@@ -1,5 +1,5 @@
-import { getAllServices, findBySlug } from "@/src/lib/content";
-import ItemDetailPage from "@/src/components/ItemDetailPage";
+import { getAllServices, findBySlug } from "@/lib/content";
+import ItemDetailPage from "@/components/ItemDetailPage";
 
 export const dynamic = "error";
 export const revalidate = false;

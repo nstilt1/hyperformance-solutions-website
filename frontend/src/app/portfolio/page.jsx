@@ -1,4 +1,4 @@
-import { CONTENT } from "@/src/lib/contentRegistry";
+import { CONTENT } from "@/lib/contentRegistry";
 import PortfolioClient from "./portfolioClient";
 
 export const dynamic = "error";

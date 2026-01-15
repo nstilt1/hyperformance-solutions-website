@@ -1,4 +1,4 @@
-import { getAllProducts, getAllServices, getAllProjects } from "@/src/lib/content";
+import { getAllProducts, getAllServices, getAllProjects } from "@/lib/content";
 
 export const CONTENT = {
   products: {

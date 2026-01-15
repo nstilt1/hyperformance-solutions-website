@@ -1,5 +1,5 @@
-import { CONTENT } from "@/src/lib/contentRegistry";
-import GalleryPageClient from "@/src/components/GalleryPageClient";
+import { CONTENT } from "@/lib/contentRegistry";
+import GalleryPageClient from "@/components/GalleryPageClient";
 import { COMMON_FILTERS } from "@/lib/filterSpecs";
 
 export const dynamic = "error";

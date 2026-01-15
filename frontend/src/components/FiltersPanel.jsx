@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { getFacetOptions } from "@/src/lib/filters";
+import { getFacetOptions } from "@/lib/filters";
 
 export default function FiltersPanel({ items, filterSpec, filters, setFilters }) {
   // filterSpec example:

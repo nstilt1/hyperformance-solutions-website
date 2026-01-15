@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { filterItems } from "@/src/lib/filters";
-import FiltersPanel from "@/src/components/FiltersPanel";
-import ItemGallery from "@/src/components/ItemGallery";
-import { CONTENT } from "@/src/lib/contentRegistry";
+import { filterItems } from "@/lib/filters";
+import FiltersPanel from "@/components/FiltersPanel";
+import ItemGallery from "@/components/ItemGallery";
+import { CONTENT } from "@/lib/contentRegistry";
 
 export default function PortfolioClient({ allItems }) {
   const [filters, setFilters] = useState({

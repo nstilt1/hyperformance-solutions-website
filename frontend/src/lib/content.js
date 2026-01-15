@@ -1,22 +1,17 @@
-import fs from "fs";
-import path from "path";
-
-function readJson(relPath) {
-  const p = path.join(process.cwd(), relPath);
-  const raw = fs.readFileSync(p, "utf8");
-  return JSON.parse(raw);
-}
+import products from "@/content/products.json";
+import projects from "@/content/projects.json";
+import services from "@/content/services.json";
 
 export function getAllProducts() {
-  return readJson("src/content/products.json");
+  return products;
 }
 
 export function getAllServices() {
-  return readJson("src/content/services.json");
+  return services;
 }
 
 export function getAllProjects() {
-  return readJson("src/content/projects.json");
+  return projects;
 }
 
 export function findBySlug(items, slug) {

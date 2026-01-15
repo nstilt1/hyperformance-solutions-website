@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import FiltersPanel from "@/src/components/FiltersPanel";
-import ItemGallery from "@/src/components/ItemGallery";
-import { filterItems } from "@/src/lib/filters";
+import FiltersPanel from "@/components/FiltersPanel";
+import ItemGallery from "@/components/ItemGallery";
+import { filterItems } from "@/lib/filters";
 
 export default function GalleryPageClient({
   title,
