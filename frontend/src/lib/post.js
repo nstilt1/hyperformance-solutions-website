@@ -11,7 +11,7 @@ function decodeJwt(jwt) {
 export async function postToApi(url, payload) {
   const session = await Auth.currentSession();
   const accessToken = session.getAccessToken().getJwtToken();
-  console.log("access claims", decodeJwt(access));
+  console.log("access claims", decodeJwt(accessToken));
 
   if (!accessToken) {
     throw new Error("No access token available (user not signed in?)");
