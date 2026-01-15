@@ -205,6 +205,8 @@ export default function ContentManager({ initial }) {
 
     // Optional: update initial snapshot (so "dirty" is truly cleared)
     initialRef.current = deepClone(data)
+
+    return res;
   }
 
   return (
