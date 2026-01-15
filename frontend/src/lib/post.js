@@ -1,10 +1,10 @@
 "use client";
 
-import { fetchAuthSession } from "aws-amplify/auth";
+import { Auth } from "aws-amplify";
 
 export async function postToApi(url, payload) {
-  const session = await fetchAuthSession();
-  const accessToken = session?.tokens?.accessToken?.toString(); // JWT string
+  const session = await Auth.currentSession();
+  const accessToken = session.getAccessToken().getJwtToken();
 
   if (!accessToken) {
     throw new Error("No access token available (user not signed in?)");
