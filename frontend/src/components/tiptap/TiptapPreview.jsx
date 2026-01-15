@@ -1,0 +1,39 @@
+"use client"
+
+import { useEffect } from "react"
+import { useEditor, EditorContent } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import Image from "@tiptap/extension-image"
+import Link from "@tiptap/extension-link"
+import Youtube from "@tiptap/extension-youtube"
+
+export default function TiptapPreview({ value }) {
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit,
+      Image,
+      Link,
+      Youtube,
+    ],
+    content: value,
+    editable: false,
+    editorProps: {
+      attributes: {
+        class: "prose max-w-none",
+      },
+    },
+  })
+
+  useEffect(() => {
+    if (!editor) return
+    const next = JSON.stringify(value || {})
+    const cur = JSON.stringify(editor.getJSON() || {})
+    if (next !== cur) {
+      editor.commands.setContent(value || { type: "doc", content: [{ type: "paragraph" }] }, false)
+    }
+  }, [editor, value])
+
+  if (!editor) return null
+  return <EditorContent editor={editor} />
+}

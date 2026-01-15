@@ -57,7 +57,7 @@ const Navbar = ({signOut}) => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-purple-600 text-xl font-bold">
-              Tiger Wellness Hub
+              Hyperformance Solutions
             </Link>
           </div>
 
