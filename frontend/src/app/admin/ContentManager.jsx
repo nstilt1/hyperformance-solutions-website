@@ -63,6 +63,9 @@ export default function ContentManager({ initial }) {
   const [frameworksDraft, setFrameworksDraft] = useState("")
   const [imagePathDraft, setImagePathDraft] = useState("")
 
+  const [gitreposDraft, setGitreposDraft] = useState("")
+  const [websiteAddressDraft, setWebsiteAddressDraft] = useState("")
+
   const entries = data[collection] || []
 
   const selectedEntry = useMemo(() => {
@@ -85,6 +88,8 @@ export default function ContentManager({ initial }) {
       setLanguagesDraft("")
       setFrameworksDraft("")
       setImagePathDraft("")
+      setGitreposDraft("")
+      setWebsiteAddressDraft("")
       return
     }
 
@@ -92,6 +97,8 @@ export default function ContentManager({ initial }) {
     setLanguagesDraft((selectedEntry.languages || []).join(", "))
     setFrameworksDraft((selectedEntry.frameworks || []).join(", "))
     setImagePathDraft(selectedEntry.imagePath || "")
+    setGitreposDraft((selectedEntry.gitRepos || []).join(", "))
+    setWebsiteAddressDraft(selectedEntry.url || "")
   }, [selectedEntry?.slug])
 
   function markDirty(fileKey) {
@@ -150,6 +157,8 @@ export default function ContentManager({ initial }) {
       imagePath: "",
       languages: [],
       frameworks: [],
+      gitRepos: [],
+      url: "",
       startDate: new Date().toISOString().slice(0, 10),
       tiptap: getEmptyDoc(),
     }
@@ -240,6 +249,8 @@ export default function ContentManager({ initial }) {
                 <SelectItem value="products">products.json</SelectItem>
               </SelectContent>
             </Select>
+            <Button onClick={() => postToApi(process.env.FRONTEND_BUILD_URL) }>Build Frontend</Button>
+            <Button onClick={() => postToApi(process.env.DASHBOARD_BUILD_URL) }>Build Dashboard</Button>
           </div>
         </div>
 
@@ -357,6 +368,7 @@ export default function ContentManager({ initial }) {
                   </div>
                 </div>
 
+                {/* Delete */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive">Delete</Button>
@@ -380,6 +392,7 @@ export default function ContentManager({ initial }) {
                 </AlertDialog>
               </div>
 
+              {/* Short description */}
               <div>
                 <label className="text-xs text-muted-foreground">Short description</label>
                 <Textarea
@@ -389,6 +402,7 @@ export default function ContentManager({ initial }) {
                 />
               </div>
 
+              {/* Image path */}
               <div>
                 <label className="text-xs text-muted-foreground">Image path (relative)</label>
                 <Input
@@ -408,7 +422,28 @@ export default function ContentManager({ initial }) {
                 </div>
               </div>
 
+              {/* Website URL */}
+              <div>
+                <label className="text-xs text-muted-foreground">Website URL</label>
+                <Input
+                  placeholder="/media/services/my-image.png"
+                  value={websiteAddressDraft}
+                  onChange={(e) => setWebsiteAddressDraft(e.target.value)}
+                  onBlur={() => {
+                    updateSelectedEntry({ url: websiteAddressDraft.trim() })
+                    setWebsiteAddressDraft(websiteAddressDraft.trim())
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.currentTarget.blur()
+                  }}
+                />
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  Website URL for this product/service/project.
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
+                {/* Language(s) */}
                 <div>
                   <label className="text-xs text-muted-foreground">Languages (comma-separated)</label>
                   <Input
@@ -424,6 +459,7 @@ export default function ContentManager({ initial }) {
                     }}
                   />
                 </div>
+                {/* Framework(s) */}
                 <div>
                   <label className="text-xs text-muted-foreground">Frameworks (comma-separated)</label>
                   <Input
@@ -438,8 +474,24 @@ export default function ContentManager({ initial }) {
                     }}
                   />
                 </div>
+                {/* Git Repo(s) */}
+                <div>
+                  <label className="text-xs text-muted-foreground">Git Repos</label>
+                  <Input
+                    value={gitreposDraft}
+                    onChange={(e) => setGitreposDraft(e.target.value)}
+                    onBlur={() => {
+                      updateSelectedEntry({ gitRepos: parseCsvishList(gitreposDraft) })
+                      setGitreposDraft(parseCsvishList(gitreposDraft).join(", "))
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.currentTarget.blur()
+                    }}
+                  />
+                </div>
               </div>
 
+              {/* Start date */}
               <div>
                 <label className="text-xs text-muted-foreground">Start date</label>
                 <Input
@@ -450,7 +502,7 @@ export default function ContentManager({ initial }) {
               </div>
 
               <Separator />
-
+              {/* Content */}
               <div>
                 <div className="text-sm font-medium mb-2">Content</div>
                 <div className="border rounded-lg p-2">
