@@ -218,6 +218,25 @@ export default function ContentManager({ initial }) {
     return res;
   }
 
+  // Refreshes the frontend/dashboard
+  const refreshSite = async (type, data) => {
+    try {
+      const res = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          actionType: type, // This tells the server which secret to use
+          ...data 
+        }),
+      });
+      
+      const result = await res.json();
+      console.log('Success:', result);
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between gap-4">
@@ -249,8 +268,10 @@ export default function ContentManager({ initial }) {
                 <SelectItem value="products">products.json</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={() => postToApi(process.env.FRONTEND_BUILD_URL) }>Build Frontend</Button>
-            <Button onClick={() => postToApi(process.env.DASHBOARD_BUILD_URL) }>Build Dashboard</Button>
+            <Button onClick={() => refreshSite('frontend', { userId: 123 })}
+        className="bg-blue-500 text-white p-2 rounded">Build Frontend</Button>
+            <Button onClick={() => refreshSite('dashboard', { sync: true })}
+        className="bg-green-500 text-white p-2 rounded">Build Dashboard</Button>
           </div>
         </div>
 
