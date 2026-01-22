@@ -5,11 +5,15 @@ async function fetchData(url) {
     return []; // Return empty array to prevent app crash
   }
 
+  // Add a query parameter to force the cloudfront distribution to
+  // return the latest data
+  const queryURL = `${url}?t=${Date.now()}`;
+
   try {
     // We add 'no-store' to ensure we always get fresh data, 
     // as it will be getting updated every time we add something 
     // new or change a page in the CMS editor.
-    const res = await fetch(url, { cache: 'no-store' });
+    const res = await fetch(queryURL, { cache: 'no-store' });
 
     if (!res.ok) {
       throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
