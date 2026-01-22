@@ -1,24 +1,40 @@
-import fs from "fs";
-import path from "path";
+// Helper function to fetch data securely
+async function fetchData(url) {
+  if (!url) {
+    console.error("Error: Missing environment variable for URL");
+    return []; // Return empty array to prevent app crash
+  }
 
-function readJson(relPath) {
-  const p = path.join(process.cwd(), relPath);
-  const raw = fs.readFileSync(p, "utf8");
-  return JSON.parse(raw);
+  try {
+    // We add 'no-store' to ensure we always get fresh data, 
+    // as it will be getting updated every time we add something 
+    // new or change a page in the CMS editor.
+    const res = await fetch(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error(`Error fetching data from ${url}:`, error);
+    return []; 
+  }
 }
 
-export function getAllProducts() {
-  return readJson("src/content/products.json");
+export async function getAllProducts() {
+  return await fetchData(process.env.URL_PRODUCTS);
 }
 
-export function getAllServices() {
-  return readJson("src/content/services.json");
+export async function getAllServices() {
+  return await fetchData(process.env.URL_SERVICES);
 }
 
-export function getAllProjects() {
-  return readJson("src/content/projects.json");
+export async function getAllProjects() {
+  return await fetchData(process.env.URL_PROJECTS);
 }
 
 export function findBySlug(items, slug) {
+  if (!items || !Array.isArray(items)) return null;
   return items.find((x) => x.slug === slug) || null;
 }
