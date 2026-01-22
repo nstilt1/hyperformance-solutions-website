@@ -66,6 +66,8 @@ export default function ContentManager({ initial }) {
   const [gitreposDraft, setGitreposDraft] = useState("")
   const [websiteAddressDraft, setWebsiteAddressDraft] = useState("")
 
+  const [titleDraft, setTitleDraft] = useState("")
+
   const entries = data[collection] || []
 
   const selectedEntry = useMemo(() => {
@@ -90,6 +92,7 @@ export default function ContentManager({ initial }) {
       setImagePathDraft("")
       setGitreposDraft("")
       setWebsiteAddressDraft("")
+      setTitleDraft("")
       return
     }
 
@@ -99,6 +102,7 @@ export default function ContentManager({ initial }) {
     setImagePathDraft(selectedEntry.imagePath || "")
     setGitreposDraft((selectedEntry.gitRepos || []).join(", "))
     setWebsiteAddressDraft(selectedEntry.url || "")
+    setTitleDraft(selectedEntry.title || "")
   }, [selectedEntry?.slug])
 
   function markDirty(fileKey) {
@@ -159,6 +163,7 @@ export default function ContentManager({ initial }) {
       frameworks: [],
       gitRepos: [],
       url: "",
+      title: "",
       startDate: new Date().toISOString().slice(0, 10),
       tiptap: getEmptyDoc(),
     }
@@ -413,6 +418,16 @@ export default function ContentManager({ initial }) {
                 </AlertDialog>
               </div>
 
+              {/* Title */}
+              <div>
+                <label className="text-xs text-muted-foreground">Title</label>
+                <Textarea
+                    value={selectedEntry.title || ""}
+                    onChange={(e) => updateSelectedEntry({ title: e.target.value })}
+                    rows={3}
+                />
+              </div>
+              
               {/* Short description */}
               <div>
                 <label className="text-xs text-muted-foreground">Short description</label>

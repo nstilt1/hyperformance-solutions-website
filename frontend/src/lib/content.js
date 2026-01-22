@@ -7,7 +7,7 @@ async function fetchData(url) {
 
   // Add a query parameter to force the cloudfront distribution to
   // return the latest data
-  const queryURL = `${url}?t=${Date.now()}`;
+  const queryURL = `${url}?t=${new Date().getTime()}`;
 
   try {
     // We add 'no-store' to ensure we always get fresh data, 
