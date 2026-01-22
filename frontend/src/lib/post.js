@@ -32,6 +32,5 @@ export async function postToApi(url, payload) {
     throw new Error(`Request failed: ${res.status} ${res.statusText}${text ? ` - ${text}` : ""}`);
   }
 
-  // If your API returns JSON
-  return await res.json().catch(() => null);
+  return res;
 }
