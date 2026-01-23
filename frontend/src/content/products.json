@@ -1,0 +1,28 @@
+[
+    {
+      "frameworks": [],
+      "gitRepos": [],
+      "imagePath": "",
+      "languages": [
+        "Rust"
+      ],
+      "shortDescription": "A test product 1...",
+      "slug": "test-product-1",
+      "startDate": "2026-01-22",
+      "tiptap": {
+        "content": [
+          {
+            "content": [
+              {
+                "text": "A test product 1",
+                "type": "text"
+              }
+            ],
+            "type": "paragraph"
+          }
+        ],
+        "type": "doc"
+      },
+      "url": ""
+    }
+  ]
