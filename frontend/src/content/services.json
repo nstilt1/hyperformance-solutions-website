@@ -27,7 +27,7 @@
     "frameworks": [
       "React"
     ],
-    "gitRepos": [],
+    "gitRepos": ["nstilt1/midimachine"],
     "imagePath": "",
     "languages": [
       "Rust",

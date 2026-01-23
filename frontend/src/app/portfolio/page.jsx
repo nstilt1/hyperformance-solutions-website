@@ -20,17 +20,17 @@ export default function PortfolioPage() {
 
         <section className="mt-10">
           <h2 className="text-2xl font-semibold">Products</h2>
-          <GalleryList collection="products" items={products} />
+          <GalleryList collection="products" items={products} basePath="portfolio" />
         </section>
 
         <section className="mt-10">
           <h2 className="text-2xl font-semibold">Projects</h2>
-          <GalleryList collection="projects" items={projects} />
+          <GalleryList collection="projects" items={projects} basePath="portfolio" />
         </section>
 
         <section className="mt-10">
           <h2 className="text-2xl font-semibold">Services</h2>
-          <GalleryList collection="services" items={services} />
+          <GalleryList collection="services" items={services} basePath="portfolio" />
         </section>
       </main>
   )

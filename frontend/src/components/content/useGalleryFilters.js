@@ -8,5 +8,6 @@ export function useGalleryFilters() {
         q: sp.get("q") || "",
         language: sp.get("language") || "",
         framework: sp.get("framework") || "",
+        tag: sp.get("tag") || "",
     }
 }

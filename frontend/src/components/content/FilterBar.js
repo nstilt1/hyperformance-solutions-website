@@ -28,17 +28,21 @@ export default function FilterBar({ itemsForOptions }) {
     const q = searchParams.get("q") || ""
     const language = searchParams.get("language") || ""
     const framework = searchParams.get("framework") || ""
+    const tag = searchParams.get("tag") || ""
 
-    const { allLanguages, allFrameworks } = useMemo(() => {
+    const { allLanguages, allFrameworks, allTags } = useMemo(() => {
         const langs = []
         const fws = []
+        const tags = []
         for (const item of itemsForOptions || []) {
             for (const l of item.languages || []) langs.push(l)
             for (const f of item.frameworks || []) fws.push(f)
+            for (const t of item.tags || []) tags.push(t)
         }
         return {
             allLanguages: uniqueSorted(langs),
             allFrameworks: uniqueSorted(fws),
+            allTags: uniqueSorted(tags),
         }
     }, [itemsForOptions])
 
@@ -55,7 +59,7 @@ export default function FilterBar({ itemsForOptions }) {
 
     return (
         <div className="mt-6">
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-4">
                 <div>
                     <div className="text-xs text-muted-foreground mb-1">Search</div>
                     <Input
@@ -92,6 +96,22 @@ export default function FilterBar({ itemsForOptions }) {
                         {allFrameworks.map((f) => (
                             <option key={f} value={f}>
                                 {f}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <div className="text-xs text-muted-foreground mb-1">Tag</div>
+                    <select
+                        className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                        value={tag}
+                        onChange={(e) => setParam("tag", e.target.value)}
+                    >
+                        <option value="">All</option>
+                        {allTags.map((t) => (
+                            <option key={t} value={t}>
+                                {t}
                             </option>
                         ))}
                     </select>
