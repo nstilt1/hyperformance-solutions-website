@@ -1,24 +1,14 @@
-import { CONTENT } from "@/lib/contentRegistry";
-import GalleryPageClient from "@/components/GalleryPageClient";
-import { COMMON_FILTERS } from "@/lib/filterSpecs";
+import { getCollection } from "@/lib/contentStore"
+import CollectionGalleryPage from "@/components/content/CollectionGalleryPage"
 
-export const dynamic = "error";
-export const revalidate = false;
+export const dynamic = "force-static"
 
-export default function ProductsPage() {
-  const items = CONTENT.products.getAll();
-
-  return (
-    <GalleryPageClient
-      title="Products"
-      basePath="/products"
-      items={items}
-      filterSpec={COMMON_FILTERS}
-      initialFilters={{
-        languages: [],
-        frameworks: [],
-        tags: [],
-      }}
-    />
-  );
+export default function ProductsIndex() {
+    return (
+        <CollectionGalleryPage
+            title="Products"
+            collection="products"
+            items={getCollection("products")}
+        />
+    )
 }

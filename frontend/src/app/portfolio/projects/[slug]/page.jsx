@@ -1,14 +1,19 @@
-import { getAllProjects, findBySlug } from "@/lib/content";
-import ItemDetailPage from "@/components/ItemDetailPage";
+import { getItem, getCollection } from "@/lib/contentStore"
+import { buildItemMetadata } from "@/lib/seo"
+import ItemPage from "@/components/content/ItemPage"
 
-export const dynamic = "error";
-export const revalidate = false;
+export const dynamic = "force-static"
 
 export function generateStaticParams() {
-  return getAllProjects().map((p) => ({ slug: p.slug }));
+  return getCollection("projects").map((p) => ({ slug: p.slug }))
 }
 
-export default function Page({ params }) {
-  const project = findBySlug(getAllProjects(), params.slug);
-  return <ItemDetailPage item={project} />;
+export function generateMetadata({ params }) {
+  const item = getItem("projects", params.slug)
+  return buildItemMetadata({ collection: "projects", item })
+}
+
+export default function ProjectPage({ params }) {
+  const item = getItem("projects", params.slug)
+  return <ItemPage item={item} />
 }

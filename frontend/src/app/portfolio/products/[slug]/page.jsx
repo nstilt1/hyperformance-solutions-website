@@ -1,14 +1,19 @@
-import { getAllProducts, findBySlug } from "@/lib/content";
-import ItemDetailPage from "@/components/ItemDetailPage";
+import { getItem, getCollection } from "@/lib/contentStore"
+import { buildItemMetadata } from "@/lib/seo"
+import ItemPage from "@/components/content/ItemPage"
 
-export const dynamic = "error";
-export const revalidate = false;
+export const dynamic = "force-static"
 
 export function generateStaticParams() {
-  return getAllProducts().map((p) => ({ slug: p.slug }));
+  return getCollection("products").map((p) => ({ slug: p.slug }))
 }
 
-export default function Page({ params }) {
-  const product = findBySlug(getAllProducts(), params.slug);
-  return <ItemDetailPage item={product} />;
+export function generateMetadata({ params }) {
+  const item = getItem("products", params.slug)
+  return buildItemMetadata({ collection: "products", item })
+}
+
+export default function ProductPage({ params }) {
+  const item = getItem("products", params.slug)
+  return <ItemPage item={item} />
 }

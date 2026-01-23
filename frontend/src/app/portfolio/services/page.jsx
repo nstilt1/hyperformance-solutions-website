@@ -1,24 +1,14 @@
-import { CONTENT } from "@/lib/contentRegistry";
-import GalleryPageClient from "@/components/GalleryPageClient";
-import { COMMON_FILTERS } from "@/lib/filterSpecs";
+import { getCollection } from "@/lib/contentStore"
+import CollectionGalleryPage from "@/components/content/CollectionGalleryPage"
 
-export const dynamic = "error";
-export const revalidate = false;
+export const dynamic = "force-static"
 
-export default function ServicesPage() {
-  const items = CONTENT.services.getAll();
-
-  return (
-    <GalleryPageClient
-      title="Services"
-      basePath="/services"
-      items={items}
-      filterSpec={COMMON_FILTERS}
-      initialFilters={{
-        languages: [],
-        frameworks: [],
-        tags: [],
-      }}
-    />
-  );
+export default function ServicesIndex() {
+    return (
+        <CollectionGalleryPage
+            title="Services"
+            collection="services"
+            items={getCollection("services")}
+        />
+    )
 }
