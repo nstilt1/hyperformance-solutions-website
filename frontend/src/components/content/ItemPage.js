@@ -5,7 +5,7 @@ import {mediaURL} from "../../lib/mediaURL";
 import MetadataChart from "@/components/content/MetadataChart"
 
 function getHeroImage(item) {
-    const path = item.heroImagePath || item.thumbnailPath || "";
+    const path = item.imagePath || item.thumbPath || "";
     return mediaURL(path);
 }
 
@@ -25,6 +25,7 @@ export default function ItemPage({ item }) {
                 ) : null}
                 <MetadataChart item={item} />
 
+                {/*
                 <div className="mt-4 flex flex-wrap gap-2 text-sm text-muted-foreground">
                     {item.startDate ? <span>Started: {item.startDate}</span> : null}
 
@@ -36,6 +37,7 @@ export default function ItemPage({ item }) {
                         <span>• Frameworks: {item.frameworks.join(", ")}</span>
                     ) : null}
                 </div>
+                */}
 
                 {/* Hero image under title + description */}
                 {hero ? (

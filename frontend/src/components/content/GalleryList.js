@@ -8,7 +8,7 @@ import {mediaURL} from "@/lib/mediaURL";
 
 function getCardImage(item) {
     // Prefer thumbnail, fall back to hero, else null
-    const path = item.thumbnailPath || item.heroImagePath || "";
+    const path = item.thumbPath || item.imagePath || "";
     return mediaURL(path);
 }
 

@@ -23,6 +23,7 @@
         ],
         "type": "doc"
       },
+      "gitRepos": ["nstilt1/test1", "nstilt1/test2", "nstilt1/test3"],
       "url": ""
     }
   ]
