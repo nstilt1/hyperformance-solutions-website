@@ -62,6 +62,7 @@ export default function ContentManager({ initial }) {
   const [languagesDraft, setLanguagesDraft] = useState("")
   const [frameworksDraft, setFrameworksDraft] = useState("")
   const [imagePathDraft, setImagePathDraft] = useState("")
+  const [thumbPathDraft, setThumbPathDraft] = useState("")
 
   const [gitreposDraft, setGitreposDraft] = useState("")
   const [websiteAddressDraft, setWebsiteAddressDraft] = useState("")
@@ -90,6 +91,7 @@ export default function ContentManager({ initial }) {
       setLanguagesDraft("")
       setFrameworksDraft("")
       setImagePathDraft("")
+      setThumbPathDraft("")
       setGitreposDraft("")
       setWebsiteAddressDraft("")
       setTitleDraft("")
@@ -100,6 +102,7 @@ export default function ContentManager({ initial }) {
     setLanguagesDraft((selectedEntry.languages || []).join(", "))
     setFrameworksDraft((selectedEntry.frameworks || []).join(", "))
     setImagePathDraft(selectedEntry.imagePath || "")
+    setThumbPathDraft(selectedEntry.thumbPath || "")
     setGitreposDraft((selectedEntry.gitRepos || []).join(", "))
     setWebsiteAddressDraft(selectedEntry.url || "")
     setTitleDraft(selectedEntry.title || "")
@@ -438,11 +441,31 @@ export default function ContentManager({ initial }) {
                 />
               </div>
 
+              {/* Thumbnail path */}
+              <div>
+                <label className="text-xs text-muted-foreground">Thumbnail path (relative)</label>
+                <Input
+                    placeholder="/media/thumbs/my-image.png"
+                    value={thumbPathDraft}
+                    onChange={(e) => setThumbPathDraft(e.target.value)}
+                    onBlur={() => {
+                      updateSelectedEntry({ thumbPath: thumbPathDraft.trim() })
+                      setThumbPathDraft(thumbPathDraft.trim())
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.currentTarget.blur()
+                    }}
+                />
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  Store a relative path (example: /media/...). The frontend can prefix CDN/base URL.
+                </div>
+              </div>
+
               {/* Image path */}
               <div>
                 <label className="text-xs text-muted-foreground">Image path (relative)</label>
                 <Input
-                  placeholder="/media/services/my-image.png"
+                  placeholder="/media/images/my-image.png"
                   value={imagePathDraft}
                   onChange={(e) => setImagePathDraft(e.target.value)}
                   onBlur={() => {
