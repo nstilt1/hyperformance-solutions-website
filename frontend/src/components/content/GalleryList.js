@@ -58,7 +58,7 @@ export default function GalleryList({ collection, items, basePath = "" }) {
                                             src={img}
                                             alt={item.title || item.slug}
                                             fill
-                                            className={`object-cover ${item.slug.contains('daydream') ? 'daydream' : ''}`}
+                                            className={`object-cover ${item.slug.includes('daydream') ? 'daydream' : ''}`}
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                             priority={false}
                                         />

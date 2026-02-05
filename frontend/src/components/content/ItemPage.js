@@ -12,7 +12,7 @@ function getHeroImage(item) {
 export default function ItemPage({ item }) {
     if (!item) notFound()
 
-    const daydream = item.slug.contains("daydream")
+    const daydream = item.slug.includes("daydream")
 
     const bodyHtml = tiptapDocToHtml(item.tiptap)
     const hero = getHeroImage(item)
