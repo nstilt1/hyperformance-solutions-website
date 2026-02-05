@@ -8,6 +8,7 @@ import Link from "@tiptap/extension-link"
 import Youtube from "@tiptap/extension-youtube"
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { lowlight } from 'lowlight'
+//import lowlight from "lowlight"
 
 export default function TiptapPreview({ value }) {
   const editor = useEditor({
