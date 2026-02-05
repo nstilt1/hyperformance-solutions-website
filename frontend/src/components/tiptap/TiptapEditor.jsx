@@ -19,8 +19,8 @@ export default function TiptapEditor({ value, onChange }) {
       Image,
       Link.configure({
         openOnClick: false,
-        autolink: true,
-        linkOnPaste: false,
+        autolink: false,
+        linkOnPaste: true,
       }),
       Youtube.configure({
         controls: true,
