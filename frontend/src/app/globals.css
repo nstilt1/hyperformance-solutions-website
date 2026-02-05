@@ -127,3 +127,23 @@ html, body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Copyright 2023 - Noah Stiltner */
+.daydream {
+  animation-name: fun;
+  animation-duration: 22.60457937880092s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  filter: saturate(4.2);
+}
+@keyframes fun {
+  0% {
+    filter: hue-rotate(0deg) saturate(0.95);
+  }
+  50% {
+    filter: hue-rotate(1800deg) saturate(0.95);
+  }
+  100% {
+    filter: hue-rotate(0deg) saturate(0.95);
+  }
+}

@@ -12,11 +12,13 @@ function getHeroImage(item) {
 export default function ItemPage({ item }) {
     if (!item) notFound()
 
+    const daydream = item.slug.contains("daydream")
+
     const bodyHtml = tiptapDocToHtml(item.tiptap)
     const hero = getHeroImage(item)
 
     return (
-        <main className="mx-auto max-w-4xl px-6 py-10">
+        <main className={`mx-auto max-w-4xl px-6 py-10 ${daydream ? 'daydream' : ''}`}>
             <header>
                 <h1 className="text-3xl font-semibold">{item.title || item.slug}</h1>
 
