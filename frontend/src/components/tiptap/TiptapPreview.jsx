@@ -6,14 +6,22 @@ import StarterKit from "@tiptap/starter-kit"
 import Image from "@tiptap/extension-image"
 import Link from "@tiptap/extension-link"
 import Youtube from "@tiptap/extension-youtube"
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { lowlight } from 'lowlight'
 
 export default function TiptapPreview({ value }) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false,
+      }),
       Image,
-      Link,
+      Link.configure({
+        autolink: false,
+        linkOnPaste: true,
+        openOnClick: true,
+      }),
       Youtube,
     ],
     content: value,
