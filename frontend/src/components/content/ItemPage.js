@@ -49,7 +49,6 @@ export default function ItemPage({ item }) {
                                 src={hero}
                                 alt={item.title || item.slug}
                                 fill
-                                className="object-cover"
                                 sizes="(max-width: 768px) 100vw, 768px"
                                 priority
                             />
