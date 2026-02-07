@@ -43,18 +43,20 @@ export default function ItemPage({ item }) {
 
                 {/* Hero image under title + description */}
                 {hero ? (
-                    <div className="mt-6 overflow-hidden rounded-2xl border bg-muted">
-                        <div className="relative aspect-[16/9] w-full">
-                            <Image
-                                src={hero}
-                                alt={item.title || item.slug}
-                                fill
-                                sizes="(max-width: 768px) 100vw, 768px"
-                                priority
-                            />
-                        </div>
+                    <div className="mt-6 overflow-hidden rounded-2xl border bg-muted flex justify-center">
+                        <Image
+                            src={hero}
+                            alt={item.title || item.slug}
+                            width={0}
+                            height={0}
+                            className="h-auto w-auto max-w-full"
+                            sizes="100vw"
+                            priority
+                        />
                     </div>
                 ) : null}
+
+
             </header>
 
             <article
