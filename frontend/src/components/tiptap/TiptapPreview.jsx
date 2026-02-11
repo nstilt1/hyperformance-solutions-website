@@ -17,6 +17,7 @@ export default function TiptapPreview({ value }) {
       StarterKit.configure({
         codeBlock: false,
       }),
+      CodeBlockLowlight.configure({ lowlight }),
       Image,
       Link.configure({
         autolink: false,
