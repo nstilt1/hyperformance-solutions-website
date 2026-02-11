@@ -131,7 +131,7 @@ html, body {
 /* Copyright 2023 - Noah Stiltner */
 .daydream {
   animation-name: fun;
-  animation-duration: 22.60457937880092s;
+  animation-duration: 32.60457937880092s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   filter: saturate(4.2);
@@ -146,4 +146,38 @@ html, body {
   100% {
     filter: hue-rotate(0deg) saturate(0.95);
   }
+}
+
+@keyframes fade {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.animate-fade {
+  animation: fade 2s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 2s ease-in-out forwards;
 }
