@@ -9,6 +9,7 @@ import Youtube from "@tiptap/extension-youtube"
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { lowlight } from 'lowlight'
 //import lowlight from "lowlight"
+import 'highlight.js/styles/atom-one-dark.css'
 
 export default function TiptapPreview({ value }) {
   const editor = useEditor({
