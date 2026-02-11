@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { tiptapDocToHtml } from "@/lib/tiptapToHtml"
 import {mediaURL} from "../../lib/mediaURL";
 import MetadataChart from "@/components/content/MetadataChart"
+import 'highlight.js/styles/atom-one-dark.css'
 
 function getHeroImage(item) {
     const path = item.imagePath || item.thumbPath || "";
