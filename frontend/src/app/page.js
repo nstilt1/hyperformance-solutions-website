@@ -18,12 +18,12 @@ const Dashboard = () => {
 
   return (
     <>
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-8 sm:pt-10 pb-16 sm:pb-20">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-8 sm:pt-10">
       <Hero />
       <BriefAbout />
       <Separator />
     </div>
-    <main className="mx-auto max-w-5xl px-6 py-10" id="portfolio">
+    <main className="mx-auto max-w-5xl px-6" id="portfolio">
       <h1 className="text-3xl font-semibold">Portfolio</h1>
       <p className="mt-2 text-muted-foreground">
         Browse everything in one place. Filters apply to all sections below.

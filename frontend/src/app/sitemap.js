@@ -9,23 +9,23 @@ export default function sitemap() {
 
     const base = [
         { url: `${siteUrl}/`, lastModified: now },
-        { url: `${siteUrl}/services`, lastModified: now },
-        { url: `${siteUrl}/projects`, lastModified: now },
-        { url: `${siteUrl}/products`, lastModified: now },
+        { url: `${siteUrl}/portfolio/services`, lastModified: now },
+        { url: `${siteUrl}/portfolio/projects`, lastModified: now },
+        { url: `${siteUrl}/portfolio/products`, lastModified: now },
     ]
 
     const serviceUrls = (services || []).map((s) => ({
-        url: `${siteUrl}/services/${s.slug}`,
+        url: `${siteUrl}/portfolio/services/${s.slug}`,
         lastModified: now,
     }))
 
     const projectUrls = (projects || []).map((p) => ({
-        url: `${siteUrl}/projects/${p.slug}`,
+        url: `${siteUrl}/portfolio/projects/${p.slug}`,
         lastModified: now,
     }))
 
     const productUrls = (products || []).map((p) => ({
-        url: `${siteUrl}/products/${p.slug}`,
+        url: `${siteUrl}/portfolio/products/${p.slug}`,
         lastModified: now,
     }))
 
