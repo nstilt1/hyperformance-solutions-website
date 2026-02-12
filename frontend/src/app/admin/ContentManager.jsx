@@ -67,6 +67,8 @@ export default function ContentManager({ initial }) {
   const [gitreposDraft, setGitreposDraft] = useState("")
   const [websiteAddressDraft, setWebsiteAddressDraft] = useState("")
 
+  const [tagsDraft, setTagsDraft] = useState("")
+
   const [titleDraft, setTitleDraft] = useState("")
 
   const entries = data[collection] || []
@@ -95,6 +97,7 @@ export default function ContentManager({ initial }) {
       setGitreposDraft("")
       setWebsiteAddressDraft("")
       setTitleDraft("")
+      setTagsDraft("")
       return
     }
 
@@ -106,6 +109,7 @@ export default function ContentManager({ initial }) {
     setGitreposDraft((selectedEntry.gitRepos || []).join(", "))
     setWebsiteAddressDraft(selectedEntry.url || "")
     setTitleDraft(selectedEntry.title || "")
+    setTagsDraft((selectedEntry.tags || []).join(", "))
   }, [selectedEntry?.slug])
 
   function markDirty(fileKey) {
@@ -167,6 +171,7 @@ export default function ContentManager({ initial }) {
       gitRepos: [],
       url: "",
       title: "",
+      tags: [],
       startDate: new Date().toISOString().slice(0, 10),
       tiptap: getEmptyDoc(),
     }
@@ -457,7 +462,7 @@ export default function ContentManager({ initial }) {
                     }}
                 />
                 <div className="text-[11px] text-muted-foreground mt-1">
-                  Store a relative path (example: /media/...). The frontend can prefix CDN/base URL.
+                  Store a relative path (example: thumbs/...). The frontend can prefix CDN/base URL.
                 </div>
               </div>
 
@@ -477,7 +482,7 @@ export default function ContentManager({ initial }) {
                   }}
                 />
                 <div className="text-[11px] text-muted-foreground mt-1">
-                  Store a relative path (example: /media/...). Your frontend can prefix CDN/base URL.
+                  Store a relative path (example: images/...). Your frontend can prefix CDN/base URL.
                 </div>
               </div>
 
@@ -542,6 +547,22 @@ export default function ContentManager({ initial }) {
                     onBlur={() => {
                       updateSelectedEntry({ gitRepos: parseCsvishList(gitreposDraft) })
                       setGitreposDraft(parseCsvishList(gitreposDraft).join(", "))
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.currentTarget.blur()
+                    }}
+                  />
+                </div>
+                {/* Tags */}
+                <div>
+                  <label className="text-xs text-muted-foreground">Tags (comma-separated)</label>
+                  <Input
+                    value={tagsDraft}
+                    onChange={(e) => setTagsDraft(e.target.value)}
+                    onBlur={() => {
+                      updateSelectedEntry({ tags: parseCsvishList(tagsDraft) })
+                      // Optionally reformat nicely after parsing:
+                      setTagsDraft(parseCsvishList(tagsDraft).join(", "))
                     }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") e.currentTarget.blur()
