@@ -29,7 +29,7 @@ export default function PortfolioPage() {
         </section>
 
         <section className="mt-10">
-          <h2 className="text-2xl font-semibold">Services</h2>
+          <h2 className="text-2xl font-semibold">Services &amp; Web-Apps</h2>
           <GalleryList collection="services" items={services} basePath="portfolio" />
         </section>
       </main>
