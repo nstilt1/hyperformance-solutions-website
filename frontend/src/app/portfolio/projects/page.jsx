@@ -9,6 +9,7 @@ export default function ProjectsIndex() {
             title="Projects"
             collection="projects"
             items={getCollection("projects")}
+            basePath="portfolio"
         />
     )
 }

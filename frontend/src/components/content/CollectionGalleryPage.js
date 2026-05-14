@@ -1,7 +1,7 @@
 import FilterBar from "@/components/content/FilterBar"
 import GalleryList from "@/components/content/GalleryList"
 
-export default function CollectionGalleryPage({ title, collection, items }) {
+export default function CollectionGalleryPage({ title, collection, items, basePath = "" }) {
     return (
         <main className="mx-auto max-w-5xl px-6 py-10">
             <h1 className="text-3xl font-semibold">{title}</h1>
@@ -13,7 +13,7 @@ export default function CollectionGalleryPage({ title, collection, items }) {
             <FilterBar itemsForOptions={items} />
 
             {/* The list uses the same URL query filters */}
-            <GalleryList collection={collection} items={items} />
+            <GalleryList collection={collection} items={items} basePath={basePath} />
         </main>
     )
 }

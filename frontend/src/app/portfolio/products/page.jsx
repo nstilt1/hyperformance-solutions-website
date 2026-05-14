@@ -9,6 +9,7 @@ export default function ProductsIndex() {
             title="Products"
             collection="products"
             items={getCollection("products")}
+            basePath="portfolio"
         />
     )
 }
