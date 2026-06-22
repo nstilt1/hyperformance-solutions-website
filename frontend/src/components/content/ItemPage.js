@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { tiptapDocToHtml } from "@/lib/tiptapToHtml"
 import {mediaURL} from "../../lib/mediaURL";
 import MetadataChart from "@/components/content/MetadataChart"
+import { HeroVideo } from "@/components/HeroVideo"
 import 'highlight.js/styles/atom-one-dark.css'
 
 function getHeroImage(item) {
@@ -14,6 +15,7 @@ export default function ItemPage({ item }) {
     if (!item) notFound()
 
     const daydream = item.slug.includes("daydream")
+    const isKaleidomo = item.slug.includes("kaleidomo")
 
     const bodyHtml = tiptapDocToHtml(item.tiptap)
     const hero = getHeroImage(item)
@@ -42,8 +44,25 @@ export default function ItemPage({ item }) {
                 </div>
                 */}
 
-                {/* Hero image under title + description */}
-                {hero ? (
+                {/* Hero image / video under title + description */}
+                {isKaleidomo ? (
+                    <div className="relative mt-6 overflow-hidden rounded-2xl border bg-muted w-full aspect-[16/9]">
+                        <HeroVideo
+                            controls={{
+                                animationDuration: 100,
+                                reorientationDuration: 64 * Math.PI,
+                                reorientationFn: "linear",
+                                triangleCenterX: 0,
+                                triangleCenterY: 0,
+                                triangleRotationRad: 0,
+                                hueRotation: 0,
+                            }}
+                            width={1080}
+                            height={720}
+                            offset_x={0}
+                        />
+                    </div>
+                ) : hero ? (
                     <div className="mt-6 overflow-hidden rounded-2xl border bg-muted flex justify-center">
                         <Image
                             src={hero}

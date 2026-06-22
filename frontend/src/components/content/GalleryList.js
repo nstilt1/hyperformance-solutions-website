@@ -5,6 +5,7 @@ import Image from "next/image"
 import { useMemo } from "react"
 import { useGalleryFilters } from "@/components/content/useGalleryFilters"
 import {mediaURL} from "@/lib/mediaURL";
+import { HeroVideo } from "@/components/HeroVideo"
 
 function getCardImage(item) {
     // Prefer thumbnail, fall back to hero, else null
@@ -42,6 +43,7 @@ export default function GalleryList({ collection, items, basePath = "" }) {
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((item) => {
                     const img = getCardImage(item)
+                    const isKaleidomo = item.slug.includes("kaleidomo")
 
                     return (
                         <Link
@@ -53,7 +55,25 @@ export default function GalleryList({ collection, items, basePath = "" }) {
                             <div className="relative w-full bg-muted">
                                 {/* 16:9 aspect box */}
                                 <div className="aspect-[16/9] w-full">
-                                    {img ? (
+                                    {isKaleidomo ? (
+                                        <div className="h-full w-full pointer-events-none">
+                                            <HeroVideo
+                                                controls={{
+                                                    animationDuration: 100,
+                                                    reorientationDuration: 64 * Math.PI,
+                                                    reorientationFn: "linear",
+                                                    triangleCenterX: 0,
+                                                    triangleCenterY: 0,
+                                                    triangleRotationRad: 0,
+                                                    hueRotation: 260,
+                                                }}
+                                                width={312}
+                                                height={176}
+                                                zoom_max={0.3}
+                                                zoom_min={0.2}
+                                            />
+                                        </div>
+                                    ) : img ? (
                                         <Image
                                             src={img}
                                             alt={item.title || item.slug}
