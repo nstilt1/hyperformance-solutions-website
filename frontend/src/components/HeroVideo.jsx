@@ -339,7 +339,6 @@ export function HeroVideo({
           h-full min-h-full min-w-full w-auto
           -translate-x-1/2 -translate-y-1/2
           object-cover
-          max-md:h-screen max-md:w-auto max-md:rotate-90
         "
       />
       <canvas
@@ -352,7 +351,6 @@ export function HeroVideo({
           h-full min-h-full min-w-full w-auto
           -translate-x-1/2 -translate-y-1/2
           object-cover
-          max-md:h-screen max-md:w-auto max-md:rotate-90
         "
       />
       {process.env.NODE_ENV !== "production" && debugStartedAtRef.current !== null && (
