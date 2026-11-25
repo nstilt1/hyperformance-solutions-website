@@ -1,7 +1,7 @@
 // MIRRORED FILE: copy lives in the dashboard branch (see AGENTS.md).
 
 import FeaturedLink from "@/components/featured/FeaturedLink"
-import { isHiddenSourceImage, parseInlineCss, safeEmbedUrl, youtubeEmbedUrl } from "@/lib/featured"
+import { isHiddenSourceImage, parseIframeCss, safeEmbedUrl, youtubeEmbedUrl } from "@/lib/featured"
 
 const CDN = process.env.NEXT_PUBLIC_CDN_URL || "https://cdn.hyperformancesolutions.com"
 
@@ -44,6 +44,7 @@ export function FeaturedSide({ side, isFirst }) {
     const src = safeEmbedUrl(side.url)
     if (!src) return <EmbedPlaceholder>Add an https:// URL to embed</EmbedPlaceholder>
     const fixed = side.aspect === "auto"
+    const { style, keyframesCss } = parseIframeCss(side.customCss)
     return (
       <div
         className="w-full"
@@ -57,8 +58,10 @@ export function FeaturedSide({ side, isFirst }) {
           allowFullScreen
           // Default look first; the admin's custom CSS overrides it.
           className="h-full w-full rounded-2xl border-0 shadow-sm ring-1 ring-black/5"
-          style={parseInlineCss(side.customCss)}
+          style={style}
         />
+        {/* Rebuilt from validated declarations only (see parseIframeCss). */}
+        {keyframesCss ? <style>{keyframesCss}</style> : null}
       </div>
     )
   }

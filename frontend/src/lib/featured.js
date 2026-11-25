@@ -176,25 +176,102 @@ export function safeEmbedUrl(url) {
   }
 }
 
-/**
- * Turns "border-radius: 16px; box-shadow: 0 4px 20px #0003" into a React style
- * object for the iframe element. CSS can only style the frame itself, not the
- * embedded page (browsers block cross-origin styling).
- */
-export function parseInlineCss(css) {
-  const style = {}
-  for (const decl of String(css || "").replace(/\/\*[\s\S]*?\*\//g, "").split(";")) {
-    const i = decl.indexOf(":")
-    if (i < 1) continue
-    const prop = decl.slice(0, i).trim().toLowerCase()
-    const value = decl.slice(i + 1).trim()
-    if (!/^-?[a-z][a-z-]*$/.test(prop) || !value || /[<>{}]|expression\(|javascript:/i.test(value)) continue
-    const key = prop.startsWith("--")
-      ? prop
-      : prop.replace(/^-(webkit|moz|ms)-/, (_, v) => `${v[0].toUpperCase()}${v.slice(1)}-`).replace(/-([a-z])/g, (_, c) => c.toUpperCase())
-    style[key] = value
+// A declaration is kept only if the property is a plain CSS name and the
+// value can't break out of a style block or run script.
+function cleanDecl(decl) {
+  const i = decl.indexOf(":")
+  if (i < 1) return null
+  const prop = decl.slice(0, i).trim().toLowerCase()
+  const value = decl.slice(i + 1).trim().replace(/\s*!important$/i, "")
+  if (!/^-?[a-z][a-z-]*$/.test(prop) || !value) return null
+  if (/[<>{}\\]|expression\(|javascript:|@import|url\(/i.test(value)) return null
+  return [prop, value]
+}
+
+function toReactKey(prop) {
+  if (prop.startsWith("--")) return prop
+  return prop
+    .replace(/^-(webkit|moz|ms)-/, (_, v) => `${v[0].toUpperCase()}${v.slice(1)}-`)
+    .replace(/-([a-z])/g, (_, c) => c.toUpperCase())
+}
+
+/** Small stable hash so keyframe names are unique per CSS snippet. */
+function hashString(str) {
+  let h = 2166136261
+  for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619)
+  return (h >>> 0).toString(36)
+}
+
+/** Index just past the "}" matching the "{" at `open`, or the end (tolerates missing braces). */
+function matchBrace(text, open) {
+  let depth = 0
+  for (let i = open; i < text.length; i++) {
+    if (text[i] === "{") depth++
+    else if (text[i] === "}" && --depth === 0) return i + 1
   }
-  return style
+  return text.length
+}
+
+/**
+ * Parses the iframe "custom CSS" box: plain declarations
+ * ("border-radius: 16px; filter: saturate(2)") are applied to the frame, and
+ * `@keyframes name { … }` blocks become real animations. Keyframe names are
+ * prefixed per snippet so embeds can't clash. The returned CSS text is rebuilt
+ * from validated pieces only. CSS can only style the frame, not the page
+ * inside it (browsers block cross-origin styling).
+ *
+ * @returns {{ style: object, keyframesCss: string }}
+ */
+export function parseIframeCss(css) {
+  let text = String(css || "").replace(/\/\*[\s\S]*?\*\//g, "")
+  const prefix = `hf${hashString(text)}-`
+  const renamed = new Map()
+  const blocks = []
+
+  const re = /@(?:-webkit-)?keyframes\s+([A-Za-z_][\w-]*)\s*\{/g
+  let rest = ""
+  let last = 0
+  let m
+  while ((m = re.exec(text))) {
+    const open = m.index + m[0].length - 1
+    const end = matchBrace(text, open)
+    rest += text.slice(last, m.index)
+    last = end
+    re.lastIndex = end
+    const name = m[1]
+    const body = text.slice(open + 1, end).replace(/\}\s*$/, "")
+    const stops = []
+    const stopRe = /([^{}]+)\{([^{}]*)\}?/g
+    let sm
+    while ((sm = stopRe.exec(body))) {
+      const selector = sm[1].trim().toLowerCase()
+      if (!/^(from|to|\d{1,3}(\.\d+)?%)(\s*,\s*(from|to|\d{1,3}(\.\d+)?%))*$/.test(selector)) continue
+      const decls = sm[2].split(";").map(cleanDecl).filter(Boolean)
+      if (decls.length) stops.push(`${selector}{${decls.map(([p, v]) => `${p}:${v}`).join(";")}}`)
+    }
+    if (stops.length) {
+      renamed.set(name, prefix + name)
+      blocks.push(`@keyframes ${prefix}${name}{${stops.join("")}}`)
+    }
+  }
+  rest += text.slice(last)
+
+  const style = {}
+  for (const decl of rest.split(";")) {
+    const d = cleanDecl(decl)
+    if (!d) continue
+    let [prop, value] = d
+    if (prop === "animation" || prop === "animation-name") {
+      value = value.replace(/[A-Za-z_][\w-]*/g, (word) => renamed.get(word) ?? word)
+    }
+    style[toReactKey(prop)] = value
+  }
+  return { style, keyframesCss: blocks.join("\n") }
+}
+
+/** Declarations-only variant (kept for callers that don't render keyframes). */
+export function parseInlineCss(css) {
+  return parseIframeCss(css).style
 }
 
 export function normalizeAnimation(a) {

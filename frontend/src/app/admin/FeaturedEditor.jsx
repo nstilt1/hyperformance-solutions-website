@@ -162,7 +162,7 @@ function SideEditor({ title, side, onChange }) {
             ) : null}
           </div>
           <Field title="Custom CSS for the iframe (optional)"
-            hint="Declarations applied to the frame itself, e.g. border-radius: 0; box-shadow: none; filter: grayscale(1). It can't restyle the page inside the frame.">
+            hint="Applied to the frame itself, e.g. border-radius: 0; filter: grayscale(1). @keyframes blocks work too (reference them with animation-name). It can't restyle the page inside the frame.">
             <Textarea rows={3} className="font-mono text-xs" placeholder="border-radius: 24px; box-shadow: 0 10px 40px rgb(0 0 0 / .2);"
               value={side.customCss || ""} onChange={(e) => onChange({ ...side, customCss: e.target.value })} />
           </Field>
