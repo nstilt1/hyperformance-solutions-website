@@ -1,7 +1,7 @@
 // MIRRORED FILE: copy lives in the dashboard branch (see AGENTS.md).
 
 import FeaturedLink from "@/components/featured/FeaturedLink"
-import { isHiddenSourceImage } from "@/lib/featured"
+import { isHiddenSourceImage, parseInlineCss, safeEmbedUrl, youtubeEmbedUrl } from "@/lib/featured"
 
 const CDN = process.env.NEXT_PUBLIC_CDN_URL || "https://cdn.hyperformancesolutions.com"
 
@@ -13,7 +13,55 @@ export function featuredImageUrl(path) {
   return `${CDN.replace(/\/+$/, "")}/media/${clean}`
 }
 
-function Side({ side, isFirst }) {
+function EmbedPlaceholder({ children }) {
+  return (
+    <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-zinc-100 p-4 text-center text-sm text-zinc-500">
+      {children}
+    </div>
+  )
+}
+
+/** One side of a featured row. Exported for the dashboard editor preview. */
+export function FeaturedSide({ side, isFirst }) {
+  if (side.type === "video") {
+    const src = youtubeEmbedUrl(side.url)
+    if (!src) return <EmbedPlaceholder>Add a YouTube link</EmbedPlaceholder>
+    return (
+      <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-sm ring-1 ring-black/5">
+        <iframe
+          src={src}
+          title={side.title || "YouTube video"}
+          loading="lazy"
+          className="h-full w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      </div>
+    )
+  }
+  if (side.type === "iframe") {
+    const src = safeEmbedUrl(side.url)
+    if (!src) return <EmbedPlaceholder>Add an https:// URL to embed</EmbedPlaceholder>
+    const fixed = side.aspect === "auto"
+    return (
+      <div
+        className="w-full"
+        style={fixed ? { height: side.height } : { aspectRatio: side.aspect }}
+      >
+        <iframe
+          src={src}
+          title={side.title || "Embedded content"}
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+          // Default look first; the admin's custom CSS overrides it.
+          className="h-full w-full rounded-2xl border-0 shadow-sm ring-1 ring-black/5"
+          style={parseInlineCss(side.customCss)}
+        />
+      </div>
+    )
+  }
   if (side.type === "image") {
     const src = featuredImageUrl(side.imagePath)
     if (!src) {
@@ -64,19 +112,20 @@ function FeaturedRow({ project }) {
       {project.dividerAbove ? <hr className="mx-auto mb-14 max-w-6xl border-zinc-200 md:mb-20" /> : null}
       <div className="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2 md:gap-12">
         {/* Mobile stacks the sides (order chosen per project); desktop is always left | right. */}
-        <div className={`${rightFirstMobile ? "order-3" : "order-1"} md:order-1`}>
-          <Side side={project.left} isFirst />
+        <div className={`min-w-0 ${rightFirstMobile ? "order-3" : "order-1"} md:order-1`}>
+          <FeaturedSide side={project.left} isFirst />
           {textSide === "left" ? button : null}
         </div>
         {project.dividerBetween ? <hr className="order-2 border-zinc-200 md:hidden" /> : null}
         <div
           className={[
+            "min-w-0",
             rightFirstMobile ? "order-1" : "order-3",
             "md:order-2",
             project.dividerBetween ? "md:self-stretch md:flex md:flex-col md:justify-center md:border-l md:border-zinc-200 md:pl-12" : "",
           ].join(" ")}
         >
-          <Side side={project.right} isFirst={project.left.type !== "text"} />
+          <FeaturedSide side={project.right} isFirst={project.left.type !== "text"} />
           {textSide === "right" ? button : null}
         </div>
       </div>

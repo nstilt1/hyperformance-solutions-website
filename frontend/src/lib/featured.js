@@ -17,7 +17,8 @@ export const PI = Math.PI
 
 export const ANIMATION_FNS = ["linear", "triangle", "saw", "sin", "sin2", "cos", "-cos"]
 export const BUTTON_VARIANTS = ["primary", "secondary"]
-export const SIDE_TYPES = ["text", "image"]
+export const SIDE_TYPES = ["text", "image", "video", "iframe"]
+export const EMBED_ASPECTS = ["16/9", "4/3", "1/1", "9/16", "auto"]
 
 export const DEFAULT_ANIMATION = {
   // Whole seconds (rational). Drives zoom + rotation cycles.
@@ -116,7 +117,84 @@ function normalizeSide(s) {
     const imagePath = str(side.imagePath)
     return { type, imagePath: isHiddenSourceImage(imagePath) ? "" : imagePath, imageAlt: str(side.imageAlt) }
   }
+  if (type === "video") {
+    return { type, url: str(side.url), title: str(side.title) }
+  }
+  if (type === "iframe") {
+    return {
+      type,
+      url: str(side.url),
+      title: str(side.title),
+      aspect: oneOf(side.aspect, EMBED_ASPECTS, "16/9"),
+      // Only used when aspect is "auto".
+      height: Math.round(num(side.height, 480, 100, 2000)),
+      customCss: str(side.customCss),
+    }
+  }
   return { type, title: str(side.title), subtext: str(side.subtext) }
+}
+
+// ── embeds ────────────────────────────────────────────────────────────────
+
+/** YouTube video ID from watch / youtu.be / shorts / embed / live URLs, or null. */
+export function youtubeId(url) {
+  let u
+  try { u = new URL(String(url || "").trim()) } catch { return null }
+  const host = u.hostname.replace(/^www\.|^m\./, "")
+  let id = null
+  if (host === "youtu.be") id = u.pathname.slice(1).split("/")[0]
+  else if (host === "youtube.com" || host === "youtube-nocookie.com" || host === "music.youtube.com") {
+    if (u.pathname === "/watch") id = u.searchParams.get("v")
+    else {
+      const m = u.pathname.match(/^\/(?:embed|shorts|live|v)\/([^/?#]+)/)
+      id = m ? m[1] : null
+    }
+  }
+  return id && /^[A-Za-z0-9_-]{6,20}$/.test(id) ? id : null
+}
+
+/** Privacy-enhanced embed URL (keeps a start time if the link had one). */
+export function youtubeEmbedUrl(url) {
+  const id = youtubeId(url)
+  if (!id) return null
+  let start = 0
+  try {
+    const t = new URL(url).searchParams.get("t") || new URL(url).searchParams.get("start") || ""
+    const m = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/)
+    if (m) start = (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0)
+  } catch { /* no start time */ }
+  return `https://www.youtube-nocookie.com/embed/${id}${start ? `?start=${start}` : ""}`
+}
+
+/** Only https URLs may be embedded. */
+export function safeEmbedUrl(url) {
+  try {
+    const u = new URL(String(url || "").trim())
+    return u.protocol === "https:" ? u.href : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Turns "border-radius: 16px; box-shadow: 0 4px 20px #0003" into a React style
+ * object for the iframe element. CSS can only style the frame itself, not the
+ * embedded page (browsers block cross-origin styling).
+ */
+export function parseInlineCss(css) {
+  const style = {}
+  for (const decl of String(css || "").replace(/\/\*[\s\S]*?\*\//g, "").split(";")) {
+    const i = decl.indexOf(":")
+    if (i < 1) continue
+    const prop = decl.slice(0, i).trim().toLowerCase()
+    const value = decl.slice(i + 1).trim()
+    if (!/^-?[a-z][a-z-]*$/.test(prop) || !value || /[<>{}]|expression\(|javascript:/i.test(value)) continue
+    const key = prop.startsWith("--")
+      ? prop
+      : prop.replace(/^-(webkit|moz|ms)-/, (_, v) => `${v[0].toUpperCase()}${v.slice(1)}-`).replace(/-([a-z])/g, (_, c) => c.toUpperCase())
+    style[key] = value
+  }
+  return style
 }
 
 export function normalizeAnimation(a) {

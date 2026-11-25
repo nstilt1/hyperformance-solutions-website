@@ -10,12 +10,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import FeaturedHero from "@/components/featured/FeaturedHero"
 import { ImagePathField } from "@/components/MediaPicker"
+import { FeaturedSide } from "@/components/featured/FeaturedProjects"
 import {
   ANIMATION_FNS,
   DEFAULT_ANIMATION,
   DEFAULT_HERO,
   PI,
   isHiddenSourceImage,
+  safeEmbedUrl,
+  youtubeId,
   newFeaturedProject,
 } from "@/lib/featured"
 
@@ -74,6 +77,23 @@ function ButtonRow({ button, onChange, onRemove, withVariant = true }) {
   )
 }
 
+const BLANK_SIDES = {
+  text: () => ({ type: "text", title: "", subtext: "" }),
+  image: () => ({ type: "image", imagePath: "", imageAlt: "" }),
+  video: () => ({ type: "video", url: "", title: "" }),
+  iframe: () => ({ type: "iframe", url: "", title: "", aspect: "16/9", height: 480, customCss: "" }),
+}
+
+/** Small live render of an embed, using the site's own component. */
+function SidePreview({ side }) {
+  return (
+    <div className="rounded-md border bg-white p-2">
+      <div className="mb-1 text-[11px] text-muted-foreground">Preview</div>
+      <FeaturedSide side={side} />
+    </div>
+  )
+}
+
 function SideEditor({ title, side, onChange }) {
   const imageBlocked = side.type === "image" && isHiddenSourceImage(side.imagePath)
   return (
@@ -81,11 +101,11 @@ function SideEditor({ title, side, onChange }) {
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">{title}</span>
         <select className={`${select} w-32`} value={side.type}
-          onChange={(e) => onChange(e.target.value === "image"
-            ? { type: "image", imagePath: "", imageAlt: "" }
-            : { type: "text", title: "", subtext: "" })}>
+          onChange={(e) => onChange(BLANK_SIDES[e.target.value]())}>
           <option value="text">Text</option>
           <option value="image">Image</option>
+          <option value="video">YouTube video</option>
+          <option value="iframe">Embed (iframe)</option>
         </select>
       </div>
       {side.type === "image" ? (
@@ -99,6 +119,54 @@ function SideEditor({ title, side, onChange }) {
           )}
           <Input placeholder="Alt text" value={side.imageAlt || ""}
             onChange={(e) => onChange({ ...side, imageAlt: e.target.value })} />
+        </>
+      ) : side.type === "video" ? (
+        <>
+          <Input placeholder="https://www.youtube.com/watch?v=…" value={side.url || ""}
+            onChange={(e) => onChange({ ...side, url: e.target.value })} />
+          {side.url && !youtubeId(side.url) ? (
+            <div className="text-[11px] text-red-600">That doesn&apos;t look like a YouTube link.</div>
+          ) : (
+            <div className="text-[11px] text-muted-foreground">Watch, youtu.be, Shorts or embed links. A ?t= start time is kept. Plays from youtube-nocookie.com.</div>
+          )}
+          <Input placeholder="Title for screen readers (optional)" value={side.title || ""}
+            onChange={(e) => onChange({ ...side, title: e.target.value })} />
+          <SidePreview side={side} />
+        </>
+      ) : side.type === "iframe" ? (
+        <>
+          <Input placeholder="https://example.com/embed" value={side.url || ""}
+            onChange={(e) => onChange({ ...side, url: e.target.value })} />
+          {side.url && !safeEmbedUrl(side.url) ? (
+            <div className="text-[11px] text-red-600">Must be a full https:// URL.</div>
+          ) : (
+            <div className="text-[11px] text-muted-foreground">Some sites refuse to be embedded; if the preview stays blank, that site blocks iframes.</div>
+          )}
+          <Input placeholder="Title for screen readers (optional)" value={side.title || ""}
+            onChange={(e) => onChange({ ...side, title: e.target.value })} />
+          <div className="grid grid-cols-2 gap-2">
+            <Field title="Shape">
+              <select className={select} value={side.aspect || "16/9"} onChange={(e) => onChange({ ...side, aspect: e.target.value })}>
+                <option value="16/9">16:9 (wide)</option>
+                <option value="4/3">4:3</option>
+                <option value="1/1">Square</option>
+                <option value="9/16">9:16 (tall)</option>
+                <option value="auto">Fixed height</option>
+              </select>
+            </Field>
+            {side.aspect === "auto" ? (
+              <Field title="Height (px)">
+                <Input type="number" min={100} max={2000} value={side.height ?? 480}
+                  onChange={(e) => onChange({ ...side, height: Number(e.target.value) })} />
+              </Field>
+            ) : null}
+          </div>
+          <Field title="Custom CSS for the iframe (optional)"
+            hint="Declarations applied to the frame itself, e.g. border-radius: 0; box-shadow: none; filter: grayscale(1). It can't restyle the page inside the frame.">
+            <Textarea rows={3} className="font-mono text-xs" placeholder="border-radius: 24px; box-shadow: 0 10px 40px rgb(0 0 0 / .2);"
+              value={side.customCss || ""} onChange={(e) => onChange({ ...side, customCss: e.target.value })} />
+          </Field>
+          <SidePreview side={side} />
         </>
       ) : (
         <>
