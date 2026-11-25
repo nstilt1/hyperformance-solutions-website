@@ -1,0 +1,27 @@
+Kaleidomo Core
+Copyright (c) 2022-2026 Hyperformance Solutions. All rights reserved.
+
+PROPRIETARY AND CONFIDENTIAL
+
+This software, including its source code, compiled WebAssembly binaries
+(e.g. kaleidomo_core_bg.wasm), JavaScript bindings, shaders, and any
+derivative works (collectively, the "Software"), is the exclusive property
+of Hyperformance Solutions.
+
+The Software is made available solely for use through websites and
+applications operated by Hyperformance Solutions. No license or right is
+granted to any person to copy, download for reuse, host, redistribute,
+sublicense, modify, decompile, disassemble, reverse engineer, or embed the
+Software in any other website, application, or service, in whole or in
+part, without prior written permission from Hyperformance Solutions.
+
+Unauthorized use, reproduction, or distribution of the Software is strictly
+prohibited and may result in civil and criminal penalties, and will be
+prosecuted to the maximum extent possible under the law, including through
+takedown notices under the Digital Millennium Copyright Act (DMCA).
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL HYPERFORMANCE SOLUTIONS BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+
+For licensing inquiries, contact Hyperformance Solutions.

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -18,6 +19,14 @@ import TiptapEditor from "@/components/tiptap/TiptapEditor"
 import TiptapPreview from "@/components/tiptap/TiptapPreview"
 
 import { postToApi } from "@/lib/post"
+import BuildStatus from "@/components/BuildStatus"
+import FeaturedEditor from "@/app/admin/FeaturedEditor"
+import { normalizeFeatured } from "@/lib/featured"
+import { writeFeaturedDraft } from "@/lib/featuredDraft"
+
+const UPDATE_CONTENT_URL =
+  process.env.NEXT_PUBLIC_UPDATE_CONTENT_URL ||
+  `${process.env.NEXT_PUBLIC_API_BASE_URL}/update_content`
 
 // ---- Helpers ----
 function deepClone(obj) {
@@ -54,6 +63,14 @@ export default function ContentManager({ initial }) {
   const [data, setData] = useState(() => deepClone(initial))
   const [dirtyFiles, setDirtyFiles] = useState(() => new Set())
 
+  // `/admin?view=featured` opens the Featured editor (navbar link).
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const view = searchParams.get("view") === "featured" ? "featured" : "collections"
+  function setView(next) {
+    router.replace(next === "featured" ? "/admin?view=featured" : "/admin", { scroll: false })
+  }
+  const buildStatusRef = useRef(null)
   const [collection, setCollection] = useState("services") // "services" | "projects" | "products"
   const [selectedSlug, setSelectedSlug] = useState(
     initial.services?.[0]?.slug || null
@@ -111,6 +128,16 @@ export default function ContentManager({ initial }) {
     setTitleDraft(selectedEntry.title || "")
     setTagsDraft((selectedEntry.tags || []).join(", "))
   }, [selectedEntry?.slug])
+
+  // Keep the preview tab's draft in sync with the editor.
+  useEffect(() => {
+    if (data.featured) writeFeaturedDraft(data.featured)
+  }, [data.featured])
+
+  function updateFeatured(next) {
+    setData((prev) => ({ ...prev, featured: next }))
+    markDirty("featured")
+  }
 
   function markDirty(fileKey) {
     setDirtyFiles((prev) => {
@@ -212,10 +239,11 @@ export default function ContentManager({ initial }) {
 
     const payload = {}
     for (const key of dirty) {
-      payload[key] = data[key]
+      // featured_data.json is normalized on save (drops empty buttons, clamps values).
+      payload[key] = key === "featured" ? normalizeFeatured(data.featured) : data[key]
     }
 
-    const res = await postToApi("https://yy35luzj4k.execute-api.us-east-1.amazonaws.com/default/update_content", payload);
+    const res = await postToApi(UPDATE_CONTENT_URL, payload);
 
     if (!res.ok) {
       const text = await res.text().catch(() => "")
@@ -245,6 +273,7 @@ export default function ContentManager({ initial }) {
       
       const result = await res.json();
       console.log('Success:', result);
+      buildStatusRef.current?.watch();
     } catch (err) {
       console.error('Error:', err);
     }
@@ -256,7 +285,19 @@ export default function ContentManager({ initial }) {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-semibold">Content Manager</h1>
 
-          <div className="flex items-center gap-2">
+          <div className="flex rounded-md border p-0.5">
+            {[["collections", "Collections"], ["featured", "Featured"]].map(([key, name]) => (
+              <button
+                key={key}
+                onClick={() => setView(key)}
+                className={`rounded px-3 py-1 text-sm ${view === key ? "bg-muted font-medium" : "text-muted-foreground"}`}
+              >
+                {name}{dirtyFiles.has(key === "featured" ? "featured" : "__none") ? " •" : ""}
+              </button>
+            ))}
+          </div>
+
+          <div className={`flex items-center gap-2 ${view === "featured" ? "hidden" : ""}`}>
             <Select value={collection} onValueChange={setCollection}>
               <SelectTrigger className="w-[220px]">
                 <SelectValue placeholder="Select collection" />
@@ -281,6 +322,8 @@ export default function ContentManager({ initial }) {
                 <SelectItem value="products">products.json</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex items-center gap-2">
             <Button onClick={() => refreshSite('frontend', { userId: 123 })}
         className="bg-blue-500 text-white p-2 rounded">Build Frontend</Button>
             <Button onClick={() => refreshSite('dashboard', { sync: true })}
@@ -314,8 +357,15 @@ export default function ContentManager({ initial }) {
         </div>
       </div>
 
+      <div className="mt-3">
+        <BuildStatus ref={buildStatusRef} />
+      </div>
+
       <Separator className="my-4" />
 
+      {view === "featured" ? (
+        <FeaturedEditor value={data.featured} onChange={updateFeatured} />
+      ) : (
       <div className="grid grid-cols-12 gap-6 min-h-[75vh]">
         {/* Left: entries list */}
         <div className="col-span-3 border rounded-lg overflow-hidden">
@@ -621,6 +671,7 @@ export default function ContentManager({ initial }) {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

@@ -35,6 +35,15 @@ const Navbar = ({signOut}) => {
     },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
+    {
+      name: 'Admin',
+      href: '/admin',
+      subRoutes: [
+        { name: 'Content', href: '/admin' },
+        { name: 'Featured / Homepage', href: '/admin?view=featured' },
+        { name: 'Homepage preview', href: '/admin/preview' },
+      ]
+    },
   ];
 
   const toggleMenu = () => {

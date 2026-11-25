@@ -39,7 +39,7 @@ export default function MediaPage() {
             // Request a pre-signed PUT URL from your Rust Lambda
             // Your API should be behind JWT authorizer; postToApi sends Bearer token.
             const presignRes = await postToApi(
-                process.env.NEXT_PUBLIC_API_BASE_URL + "/hf_presign",
+                process.env.NEXT_PUBLIC_PRESIGN_URL || process.env.NEXT_PUBLIC_API_BASE_URL + "/hf_presign",
                 {
                     folder,
                     filename: sanitizeFilename(file.name),

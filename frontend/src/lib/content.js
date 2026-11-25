@@ -38,6 +38,18 @@ export async function getAllProjects() {
   return await fetchData(process.env.URL_PROJECTS);
 }
 
+// featured_data.json sits next to the other content files. URL_FEATURED can
+// override; otherwise it's derived from URL_PRODUCTS. A missing file (first
+// deploy) yields [] which normalizeFeatured turns into the defaults.
+export async function getFeatured() {
+  const url =
+    process.env.URL_FEATURED ||
+    (process.env.URL_PRODUCTS
+      ? process.env.URL_PRODUCTS.replace(/products\.json$/, "featured_data.json")
+      : "")
+  return await fetchData(url);
+}
+
 export function findBySlug(items, slug) {
   if (!items || !Array.isArray(items)) return null;
   return items.find((x) => x.slug === slug) || null;
