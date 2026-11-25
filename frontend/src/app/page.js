@@ -4,22 +4,26 @@ import React, { Suspense } from "react";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import ImageCard from "@/components/ImageCard";
 import { motion } from 'framer-motion';
-import Hero from "@/components/Hero";
 import BriefAbout from "@/components/BriefAbout";
 import { Separator } from "@radix-ui/react-separator";
 import { getAllItems } from "@/lib/contentStore"
 import FilterBar from "@/components/content/FilterBar"
 import GalleryList from "@/components/content/GalleryList"
+import FeaturedHero from "@/components/featured/FeaturedHero"
+import FeaturedProjects from "@/components/featured/FeaturedProjects"
+import { getFeatured } from "@/lib/featuredStore"
 
 export const dynamic = "force-static"
 const Dashboard = () => {
   const { products, projects, services } = getAllItems()
   const all = [...products, ...projects, ...services]
+  const featured = getFeatured()
 
   return (
     <>
+    <FeaturedHero hero={featured.hero} />
+    <FeaturedProjects projects={featured.projects} />
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-8 sm:pt-10">
-      <Hero />
       <BriefAbout />
       <Separator />
     </div>

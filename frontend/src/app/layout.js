@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import NavBar from "@/components/NavbarResponsive";
 import { Toaster } from "@/components/ui/sonner";
+import PhotosensitivityGate from "@/components/PhotosensitivityGate";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,8 +30,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavBar />
-        {children}
+        <PhotosensitivityGate>
+          <NavBar />
+          {children}
+        </PhotosensitivityGate>
       </body>
     </html>
   );

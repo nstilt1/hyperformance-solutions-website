@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { getKaleidomoBindings } from "@/lib/kaleidomoRuntime";
 
 // ── Media URLs ────────────────────────────────────────────────────────────
 const SOURCE_IMAGE_URL = "/wasm-assets/og-pink-flower-comp-3.jpg";
@@ -11,32 +12,18 @@ const FALLBACK_VIDEO_URL =
 const FIRST_FRAME_IMAGE_URL =
   "https://cdn.hyperformancesolutions.com/media/images/kaleidomo-first-frame.jpg";
 
-// ── WASM URLs ─────────────────────────────────────────────────────────────
-const WASM_JS_URL  = "/wasm/kaleidomo_core.js";
-const WASM_BIN_URL = "/wasm/kaleidomo_core_bg.wasm";
+// ── WASM ──────────────────────────────────────────────────────────────────
+// Shares the renderer runtime (download/compile/cache) with the homepage hero.
 
-const DEBUG = true;
+const DEBUG = false;
 
-// ── Module-level WASM initialisation cache ────────────────────────────────
-// The JS module + wasm binary init is done once and cached. This is safe
-// because wasm-bindgen's init() is idempotent after the first call, but
-// running it concurrently (Strict Mode double-mount) corrupts internal state.
-let wasmModPromise = null;
-
-async function getWasmMod() {
-  if (!wasmModPromise) {
-    wasmModPromise = (async () => {
-      const wasmBinUrl = new URL(WASM_BIN_URL, window.location.origin);
-      const mod = await import(/* webpackIgnore: true */ WASM_JS_URL);
-      await mod.default(wasmBinUrl);
-      return mod;
-    })().catch((e) => {
-      wasmModPromise = null; // allow retry on next mount
-      throw e;
-    });
-  }
-  return wasmModPromise;
+function getWasmMod() {
+  return getKaleidomoBindings();
 }
+
+// Extra args required by the current kaleidomo_core build (no recolor, no AA).
+const NEW_API_TAIL = [false, "", 0, 0.08, 64];
+const NEW_API_QUALITY = [0, true, 1, 1, false];
 
 // ── Serialisation mutex ───────────────────────────────────────────────────
 // React Strict Mode fires: mount → (sync) cleanup → mount.
@@ -118,6 +105,9 @@ function applyVideoSettings(vs, controls, zoom_max, zoom_min) {
       ? controls.reorientationFn
       : "linear",
   );
+
+  // Current renderer adds radius modulation; keep it off for these thumbnails.
+  vs.radius_duration = 0;
 }
 
 export function HeroVideo({
@@ -240,7 +230,9 @@ export function HeroVideo({
           controls.triangleRotationRad,
           tile_count,
           260, // hue rotate
+          ...NEW_API_TAIL,
           vs,
+          ...NEW_API_QUALITY,
         );
       } catch (e) {
         teardown();
@@ -283,7 +275,9 @@ export function HeroVideo({
         controls.triangleRotationRad,
         tile_count,
         260, // huerotate
+        ...NEW_API_TAIL,
         vs,
+        ...NEW_API_QUALITY,
       );
     } catch (e) {
       debugLog("Failed to update hero controls:", e);
