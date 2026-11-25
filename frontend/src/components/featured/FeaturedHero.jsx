@@ -23,9 +23,9 @@ export default function FeaturedHero({ hero, trackLoading = true }) {
           {hero.subtitle ? (
             <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-200 md:text-xl">{hero.subtitle}</p>
           ) : null}
-          {hero.buttons.length > 0 ? (
+          {hero.buttons.some((b) => b.label && b.href) ? (
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4">
-              {hero.buttons.map((b, i) => (
+              {hero.buttons.filter((b) => b.label && b.href).map((b, i) => (
                 <FeaturedLink key={`${b.href}-${i}`} href={b.href} variant={b.variant}>
                   {b.label}
                 </FeaturedLink>
