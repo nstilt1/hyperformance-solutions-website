@@ -1,6 +1,9 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { MediaPickerDialog } from "@/components/MediaPicker"
+import { mediaPathToUrl } from "@/lib/media"
 import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Image from "@tiptap/extension-image"
@@ -11,6 +14,7 @@ import { lowlight } from 'lowlight'
 import 'highlight.js/styles/atom-one-dark.css'
 
 export default function TiptapEditor({ value, onChange }) {
+  const [pickerOpen, setPickerOpen] = useState(false)
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -54,5 +58,23 @@ export default function TiptapEditor({ value, onChange }) {
   }, [editor, value])
 
   if (!editor) return null
-  return <EditorContent editor={editor} />
+  return (
+    <>
+      <div className="mb-2 flex gap-2 border-b pb-2">
+        <Button type="button" variant="outline" size="sm" onClick={() => setPickerOpen(true)}>
+          Insert image
+        </Button>
+      </div>
+      <EditorContent editor={editor} />
+      <MediaPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={(path, file) => {
+          // Content is rendered to HTML at build time, so store the full CDN URL.
+          const src = file?.url || mediaPathToUrl(path)
+          if (src) editor.chain().focus().setImage({ src, alt: "" }).run()
+        }}
+      />
+    </>
+  )
 }

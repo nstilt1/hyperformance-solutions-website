@@ -20,6 +20,7 @@ import TiptapPreview from "@/components/tiptap/TiptapPreview"
 
 import { postToApi } from "@/lib/post"
 import BuildStatus from "@/components/BuildStatus"
+import { ImagePathField } from "@/components/MediaPicker"
 import FeaturedEditor from "@/app/admin/FeaturedEditor"
 import { normalizeFeatured } from "@/lib/featured"
 import { writeFeaturedDraft } from "@/lib/featuredDraft"
@@ -499,17 +500,11 @@ export default function ContentManager({ initial }) {
               {/* Thumbnail path */}
               <div>
                 <label className="text-xs text-muted-foreground">Thumbnail path (relative)</label>
-                <Input
-                    placeholder="/media/thumbs/my-image.png"
-                    value={thumbPathDraft}
-                    onChange={(e) => setThumbPathDraft(e.target.value)}
-                    onBlur={() => {
-                      updateSelectedEntry({ thumbPath: thumbPathDraft.trim() })
-                      setThumbPathDraft(thumbPathDraft.trim())
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") e.currentTarget.blur()
-                    }}
+                <ImagePathField
+                  placeholder="thumbs/my-image.png"
+                  uploadFolder="thumbs"
+                  value={selectedEntry.thumbPath || ""}
+                  onChange={(path) => updateSelectedEntry({ thumbPath: path })}
                 />
                 <div className="text-[11px] text-muted-foreground mt-1">
                   Store a relative path (example: thumbs/...). The frontend can prefix CDN/base URL.
@@ -519,17 +514,11 @@ export default function ContentManager({ initial }) {
               {/* Image path */}
               <div>
                 <label className="text-xs text-muted-foreground">Image path (relative)</label>
-                <Input
-                  placeholder="/media/images/my-image.png"
-                  value={imagePathDraft}
-                  onChange={(e) => setImagePathDraft(e.target.value)}
-                  onBlur={() => {
-                    updateSelectedEntry({ imagePath: imagePathDraft.trim() })
-                    setImagePathDraft(imagePathDraft.trim())
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") e.currentTarget.blur()
-                  }}
+                <ImagePathField
+                  placeholder="images/my-image.png"
+                  uploadFolder="images"
+                  value={selectedEntry.imagePath || ""}
+                  onChange={(path) => updateSelectedEntry({ imagePath: path })}
                 />
                 <div className="text-[11px] text-muted-foreground mt-1">
                   Store a relative path (example: images/...). Your frontend can prefix CDN/base URL.

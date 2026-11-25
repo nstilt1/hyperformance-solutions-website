@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import FeaturedHero from "@/components/featured/FeaturedHero"
+import { ImagePathField } from "@/components/MediaPicker"
 import {
   ANIMATION_FNS,
   DEFAULT_ANIMATION,
@@ -89,12 +90,12 @@ function SideEditor({ title, side, onChange }) {
       </div>
       {side.type === "image" ? (
         <>
-          <Input placeholder="images/my-project.png" value={side.imagePath || ""}
-            onChange={(e) => onChange({ ...side, imagePath: e.target.value })} />
+          <ImagePathField placeholder="images/my-project.png" uploadFolder="images" value={side.imagePath || ""}
+            onChange={(imagePath) => onChange({ ...side, imagePath })} />
           {imageBlocked ? (
             <div className="text-[11px] text-red-600">That is the animation&apos;s source image, which is never shown. Pick another image.</div>
           ) : (
-            <div className="text-[11px] text-muted-foreground">Relative to the CDN&apos;s /media/ folder, or a full URL.</div>
+            <div className="text-[11px] text-muted-foreground">Browse S3 or upload, or type a path relative to the CDN&apos;s /media/ folder (or a full URL).</div>
           )}
           <Input placeholder="Alt text" value={side.imageAlt || ""}
             onChange={(e) => onChange({ ...side, imageAlt: e.target.value })} />
