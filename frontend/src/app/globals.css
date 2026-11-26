@@ -222,12 +222,3 @@ html, body {
   .photosensitivity-actions { gap: 8px; margin: 20px 0 16px; }
   .photosensitivity-actions button, .photosensitivity-actions a { font-size: 14px; padding: 12px; flex: 1 1 auto; }
 }
-
-/* ── Daydream Filter (driven by src/lib/daydream.js) ──
-   JS sets data-daydream on <html> and updates --dd-hue / --dd-sat each frame.
-   "full" filters the site content wrapper (not <html>) so the Daydream panel,
-   mounted outside it, stays readable. */
-html[data-daydream="full"] [data-site-content],
-html[data-daydream="media"] [data-site-content] :is(img, video, iframe, canvas) {
-  filter: hue-rotate(var(--dd-hue, 0deg)) saturate(var(--dd-sat, 1));
-}

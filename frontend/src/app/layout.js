@@ -2,6 +2,7 @@
 
 import localFont from "next/font/local";
 import "./globals.css";
+import "@/plugins/daydream/daydream.css";
 import NavBar from "@/components/NavbarResponsive";
 import { Toaster } from "@/components/ui/sonner";
 import PhotosensitivityGate from "@/components/PhotosensitivityGate";

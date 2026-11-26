@@ -1,0 +1,98 @@
+/* ── Daydream Filter plugin ──────────────────────────────────────────────
+   Plain CSS (no Tailwind) so the folder works in any project. Import once
+   from the root layout. Theming hooks: --dd-panel-top (navbar card offset),
+   --dd-accent, --dd-z. */
+
+:root {
+  --dd-accent: #18181b;
+  --dd-z: 60;
+  --dd-panel-top: 4.25rem;
+}
+
+/* The effect. engine.ts sets data-daydream="full|media" on <html> while on,
+   marks the host's content wrapper with [data-dd-root], and updates
+   --dd-hue / --dd-sat every frame. Plugin UI outside the wrapper (panel,
+   floating button) stays readable in full-page mode. */
+html[data-daydream="full"] [data-dd-root],
+html[data-daydream="media"] [data-dd-root] :is(img, video, iframe, canvas) {
+  filter: hue-rotate(var(--dd-hue, 0deg)) saturate(var(--dd-sat, 1));
+}
+
+/* Brain: greyed out when off (like the extension popup), live filter when on.
+   A brain inside the content wrapper inherits full-page mode's filter. */
+.dd-brain { display: block; filter: saturate(0); opacity: .5; transition: opacity .2s; }
+html[data-daydream] .dd-brain {
+  opacity: 1;
+  filter: hue-rotate(var(--dd-hue, 0deg)) saturate(var(--dd-sat, 1));
+}
+html[data-daydream="full"] .dd-brain[data-inherits] { filter: none; }
+
+/* Shared bits */
+.dd-state { width: 1.9em; text-align: left; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: #9ca3af; }
+.dd-state[data-on] { color: #111827; }
+.dd-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 4px; border: 0; border-radius: 999px; background: transparent; color: #6b7280; cursor: pointer;
+}
+.dd-icon-btn:hover { background: #f3f4f6; color: #111827; }
+.dd-flip { transform: rotate(180deg); }
+.dd-flip, .dd-icon-btn svg { transition: transform .15s; }
+
+/* Toggle pill: the brain button is layered over the pill button, so the brain
+   toggles and the rest of the pill opens settings. */
+.dd-pill { position: relative; display: inline-flex; border-radius: 999px; font: 500 14px/1 system-ui, sans-serif; }
+.dd-pill button { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.dd-pill-main {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  border-radius: 999px !important; color: #374151 !important;
+}
+.dd-pill-brain {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center; justify-content: center; padding: 2px !important; border-radius: 999px;
+}
+.dd-pill-brain:hover { background: rgb(0 0 0 / .06) !important; }
+.dd-pill-brain:focus-visible, .dd-pill-main:focus-visible { outline: 2px solid var(--dd-accent); outline-offset: 2px; }
+
+/* navbar variant: compact */
+.dd-pill[data-variant="navbar"] .dd-pill-main { height: 36px; padding: 0 6px 0 38px; }
+.dd-pill[data-variant="navbar"] .dd-pill-main:hover { background: #f3f4f6 !important; }
+.dd-pill[data-variant="navbar"] .dd-pill-brain { left: 4px; }
+
+/* floating variant: bottom-right */
+.dd-pill[data-variant="floating"] {
+  position: fixed; right: 16px; bottom: 16px; z-index: var(--dd-z);
+  border: 1px solid #e5e7eb; background: #fff; color: #18181b; box-shadow: 0 10px 25px rgb(0 0 0 / .15);
+}
+.dd-pill[data-variant="floating"] .dd-pill-main { height: 48px; padding: 0 14px 0 50px; }
+.dd-pill[data-variant="floating"] .dd-pill-main:hover { background: #f4f4f5 !important; }
+.dd-pill[data-variant="floating"] .dd-pill-brain { left: 8px; }
+.dd-pill-name { color: #18181b; }
+
+/* Settings card */
+.dd-panel {
+  position: fixed; z-index: var(--dd-z); width: min(92vw, 300px); box-sizing: border-box;
+  padding: 16px; border: 1px solid #e4e4e7; border-radius: 16px;
+  background: rgb(255 255 255 / .96); color: #27272a; box-shadow: 0 20px 40px rgb(0 0 0 / .18);
+  font: 14px/1.4 system-ui, sans-serif; backdrop-filter: blur(8px);
+}
+.dd-panel[data-anchor="navbar"] { top: var(--dd-panel-top); right: 8px; }
+.dd-panel[data-anchor="floating"] { right: 16px; bottom: 76px; }
+.dd-panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+.dd-title { font-weight: 600; }
+.dd-muted { font-size: 12px; color: #71717a; }
+.dd-power {
+  width: 100%; margin-bottom: 14px; padding: 9px 14px; border: 1px solid #d4d4d8; border-radius: 12px;
+  background: #fff; color: #18181b; font: 500 14px system-ui, sans-serif; cursor: pointer;
+}
+.dd-power[aria-pressed="true"] { border-color: var(--dd-accent); background: var(--dd-accent); color: #fff; }
+.dd-field { display: block; margin: 10px 0 0; padding: 0; border: 0; }
+.dd-field legend { padding: 0; margin-bottom: 4px; }
+.dd-field input[type="range"] { width: 100%; margin: 4px 0 0; accent-color: var(--dd-accent); }
+.dd-row { display: flex; justify-content: space-between; font-size: 12px; }
+.dd-segmented { display: flex; gap: 6px; }
+.dd-segmented button {
+  flex: 1; padding: 5px 6px; border: 1px solid #d4d4d8; border-radius: 8px;
+  background: #fff; color: #27272a; font: 12px system-ui, sans-serif; cursor: pointer;
+}
+.dd-segmented button[aria-pressed="true"] { border-color: var(--dd-accent); background: var(--dd-accent); color: #fff; }
+.dd-note { margin: 12px 0 0; font-size: 11px; line-height: 1.4; color: #71717a; }

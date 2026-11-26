@@ -15,7 +15,7 @@ import {
   subscribeSiteLoading,
 } from "@/lib/siteLoadingStore"
 import { getCompiledKaleidomo, rendererSupported } from "@/lib/kaleidomoRuntime"
-import DaydreamFilter from "@/components/DaydreamFilter"
+import PluginSlot from "@/plugins/PluginSlot"
 
 const ACKNOWLEDGMENT_KEY = "hf:photosensitivity-acknowledged:v1"
 
@@ -124,8 +124,9 @@ export default function PhotosensitivityGate({ children }) {
       >
         {children}
       </div>
-      {/* Outside the content wrapper so full-page Daydream doesn't recolor its own controls. */}
-      {acknowledged ? <DaydreamFilter /> : null}
+      {/* Overlay plugins (floating UI) live outside the content wrapper so
+          content-wide effects like full-page Daydream never recolor them. */}
+      {acknowledged ? <PluginSlot name="overlay" /> : null}
       {!acknowledged && (
         <div
           className="photosensitivity-screen"

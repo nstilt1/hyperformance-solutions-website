@@ -16,6 +16,7 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import PluginSlot from "@/plugins/PluginSlot";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -66,6 +67,8 @@ const Navbar = () => {
             </Link>
           </div>
 
+        {/* Right side: desktop links, Daydream toggle (always visible), mobile menu button */}
+        <div className="flex items-center gap-2 md:gap-4">
         {/* Desktop Menu */}
         <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
@@ -101,8 +104,10 @@ const Navbar = () => {
             </div>
         </div>
 
+        <PluginSlot name="navbar" />
+
         {/* Mobile Menu Button */}
-        <div className="md:hidden z-50">
+        <div className="md:hidden z-50 flex items-center">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-gray-600 hover:text-purple-600 focus:outline-none"
@@ -115,6 +120,7 @@ const Navbar = () => {
               )}
             </svg>
           </button>
+        </div>
         </div>
 
           {/* Mobile Menu Dropdown */}
