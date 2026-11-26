@@ -51,7 +51,7 @@ export const DAYDREAM_DEFAULTS: DaydreamSettings = {
   isFullPage: true,
   mode: "inOut",
   cpc: 1,
-  placement: "navbar",
+  placement: "floating",
 }
 
 export const DAYDREAM_LIMITS = {

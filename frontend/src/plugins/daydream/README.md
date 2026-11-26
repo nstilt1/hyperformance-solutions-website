@@ -9,7 +9,7 @@ are copied verbatim, odd constants included. Don't simplify them.
 Visitors get a toggle (brain + ON/OFF) and a settings card with the
 extension's controls: rate, saturation, full page vs. images and videos, In /
 Out / In & Out, number of cycles. They also choose where the toggle lives:
-**navbar** or **floating button** (bottom-right). Either way the toggle is one
+**floating button** (bottom-right, the default) or **navbar**. Either way the toggle is one
 pill: the brain toggles the filter and the rest of the pill opens settings. Settings persist in `localStorage`. The filter
 starts **off**.
 
@@ -53,7 +53,7 @@ starts **off**.
      contentSelector: "main",              // element full-page mode filters
      storageKey: "mysite:daydream:v1",
      brainSrc: "/images/brain.png",
-     // defaults: { ...DAYDREAM_DEFAULTS, placement: "floating" },
+     // defaults: { ...DAYDREAM_DEFAULTS, placement: "navbar" },
    })
    ```
    CSS hooks: `--dd-panel-top` (navbar card offset below your header),
