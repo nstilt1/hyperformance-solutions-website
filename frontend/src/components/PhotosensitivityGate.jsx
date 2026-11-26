@@ -15,6 +15,7 @@ import {
   subscribeSiteLoading,
 } from "@/lib/siteLoadingStore"
 import { getCompiledKaleidomo, rendererSupported } from "@/lib/kaleidomoRuntime"
+import DaydreamFilter from "@/components/DaydreamFilter"
 
 const ACKNOWLEDGMENT_KEY = "hf:photosensitivity-acknowledged:v1"
 
@@ -123,6 +124,8 @@ export default function PhotosensitivityGate({ children }) {
       >
         {children}
       </div>
+      {/* Outside the content wrapper so full-page Daydream doesn't recolor its own controls. */}
+      {acknowledged ? <DaydreamFilter /> : null}
       {!acknowledged && (
         <div
           className="photosensitivity-screen"
