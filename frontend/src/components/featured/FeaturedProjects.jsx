@@ -1,6 +1,7 @@
 // MIRRORED FILE: copy lives in the dashboard branch (see AGENTS.md).
 
 import FeaturedLink from "@/components/featured/FeaturedLink"
+import OpenverseSearch from "@/components/featured/OpenverseSearch"
 import { isHiddenSourceImage, parseIframeCss, safeEmbedUrl, youtubeEmbedUrl } from "@/lib/featured"
 
 const CDN = process.env.NEXT_PUBLIC_CDN_URL || "https://cdn.hyperformancesolutions.com"
@@ -23,6 +24,9 @@ function EmbedPlaceholder({ children }) {
 
 /** One side of a featured row. Exported for the dashboard editor preview. */
 export function FeaturedSide({ side, isFirst }) {
+  if (side.type === "openverse") {
+    return <OpenverseSearch side={side} />
+  }
   if (side.type === "video") {
     const src = youtubeEmbedUrl(side.url)
     if (!src) return <EmbedPlaceholder>Add a YouTube link</EmbedPlaceholder>
@@ -70,14 +74,20 @@ export function FeaturedSide({ side, isFirst }) {
     if (!src) {
       return <div className="aspect-[4/3] w-full rounded-2xl bg-zinc-100" aria-hidden="true" />
     }
+    const { style, keyframesCss } = parseIframeCss(side.customCss)
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        alt={side.imageAlt || ""}
-        loading="lazy"
-        className="w-full rounded-2xl object-cover shadow-sm ring-1 ring-black/5"
-      />
+      <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={side.imageAlt || ""}
+          loading="lazy"
+          className="w-full rounded-2xl object-cover shadow-sm ring-1 ring-black/5"
+          style={style}
+        />
+        {/* Rebuilt from validated declarations only (see parseIframeCss). */}
+        {keyframesCss ? <style>{keyframesCss}</style> : null}
+      </>
     )
   }
   const Heading = isFirst ? "h2" : "h3"
@@ -97,7 +107,39 @@ export function FeaturedSide({ side, isFirst }) {
   )
 }
 
+/** Full-width row: optional heading, then one content block across the row. */
+function FullWidthRow({ project }) {
+  const hasHeading = project.title || project.subtext
+  return (
+    <section className="px-6 py-14 md:py-20">
+      {project.dividerAbove ? <hr className="mx-auto mb-14 max-w-6xl border-zinc-200 md:mb-20" /> : null}
+      <div className="mx-auto max-w-6xl">
+        {hasHeading ? (
+          <div className="mb-8 max-w-3xl md:mb-10">
+            {project.title ? (
+              <h2 className="text-balance text-3xl font-bold tracking-tight text-zinc-900 md:text-4xl">{project.title}</h2>
+            ) : null}
+            {project.subtext ? (
+              <p className="mt-4 whitespace-pre-line text-base leading-7 text-zinc-600 md:text-lg">{project.subtext}</p>
+            ) : null}
+          </div>
+        ) : null}
+        <div className="min-w-0">
+          <FeaturedSide side={project.left} isFirst={!project.title} />
+        </div>
+        {project.button ? (
+          <div className="mt-8">
+            <FeaturedLink href={project.button.href} variant="dark">{project.button.label}</FeaturedLink>
+          </div>
+        ) : null}
+      </div>
+      {project.dividerBelow ? <hr className="mx-auto mt-14 max-w-6xl border-zinc-200 md:mt-20" /> : null}
+    </section>
+  )
+}
+
 function FeaturedRow({ project }) {
+  if (project.layout === "full") return <FullWidthRow project={project} />
   const rightFirstMobile = project.mobileOrder === "right-first"
   // Put the button under the text side; if both/neither are text, under the row.
   const textSide =

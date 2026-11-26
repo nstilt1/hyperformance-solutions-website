@@ -17,6 +17,7 @@ import {
   DEFAULT_HERO,
   PI,
   isHiddenSourceImage,
+  instagramPostId,
   safeEmbedUrl,
   youtubeId,
   newFeaturedProject,
@@ -79,12 +80,28 @@ function ButtonRow({ button, onChange, onRemove, withVariant = true }) {
 
 const BLANK_SIDES = {
   text: () => ({ type: "text", title: "", subtext: "" }),
-  image: () => ({ type: "image", imagePath: "", imageAlt: "" }),
+  image: () => ({ type: "image", imagePath: "", imageAlt: "", customCss: "" }),
   video: () => ({ type: "video", url: "", title: "" }),
   iframe: () => ({ type: "iframe", url: "", title: "", aspect: "16/9", height: 480, customCss: "" }),
+  openverse: () => ({ type: "openverse", defaultQuery: "psychedelic art", placeholder: "Search openly licensed art…", pageSize: 20, includeShareAlike: false, customCss: "" }),
 }
 
-/** Small live render of an embed, using the site's own component. */
+function CustomCssField({ target, value, onChange }) {
+  return (
+    <Field title={`Custom CSS for the ${target} (optional)`}
+      hint={target === "results"
+        ? "Applied to each result image in this block only, e.g. filter: saturate(2). @keyframes blocks work too (reference them with animation-name)."
+        : target === "iframe"
+        ? "Applied to the frame itself, e.g. border-radius: 0; filter: grayscale(1). @keyframes blocks work too (reference them with animation-name). It can't restyle the page inside the frame."
+        : "Applied to the image only, e.g. border-radius: 0; filter: saturate(2). @keyframes blocks work too (reference them with animation-name)."}>
+      <Textarea rows={3} className="font-mono text-xs"
+        placeholder={"filter: saturate(1.5);\nanimation: spin 20s linear infinite;\n@keyframes spin { to { filter: hue-rotate(360deg) } }"}
+        value={value || ""} onChange={(e) => onChange(e.target.value)} />
+    </Field>
+  )
+}
+
+/** Small live render of a side, using the site's own component. */
 function SidePreview({ side }) {
   return (
     <div className="rounded-md border bg-white p-2">
@@ -106,6 +123,7 @@ function SideEditor({ title, side, onChange }) {
           <option value="image">Image</option>
           <option value="video">YouTube video</option>
           <option value="iframe">Embed (iframe)</option>
+          <option value="openverse">Openverse art search</option>
         </select>
       </div>
       {side.type === "image" ? (
@@ -119,6 +137,8 @@ function SideEditor({ title, side, onChange }) {
           )}
           <Input placeholder="Alt text" value={side.imageAlt || ""}
             onChange={(e) => onChange({ ...side, imageAlt: e.target.value })} />
+          <CustomCssField target="image" value={side.customCss} onChange={(customCss) => onChange({ ...side, customCss })} />
+          {side.imagePath ? <SidePreview side={side} /> : null}
         </>
       ) : side.type === "video" ? (
         <>
@@ -133,14 +153,43 @@ function SideEditor({ title, side, onChange }) {
             onChange={(e) => onChange({ ...side, title: e.target.value })} />
           <SidePreview side={side} />
         </>
+      ) : side.type === "openverse" ? (
+        <>
+          <Field title="Default search" hint="What visitors see before they search. They can search anything from the box.">
+            <Input value={side.defaultQuery ?? ""} onChange={(e) => onChange({ ...side, defaultQuery: e.target.value })} />
+          </Field>
+          <Field title="Search box placeholder">
+            <Input value={side.placeholder ?? ""} onChange={(e) => onChange({ ...side, placeholder: e.target.value })} />
+          </Field>
+          <Field title="Results per page">
+            <select className={select} value={side.pageSize ?? 20} onChange={(e) => onChange({ ...side, pageSize: Number(e.target.value) })}>
+              {[12, 20, 30].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </Field>
+          <Check checked={!!side.includeShareAlike} onChange={(v) => onChange({ ...side, includeShareAlike: v })}>
+            Include CC BY-SA images
+          </Check>
+          <div className="text-[11px] text-muted-foreground">
+            Results are limited to CC BY, CC0 and public domain (commercial use and edits allowed), each shown with its credit and licence link.
+            CC BY-SA also allows that, but technically requires filtered versions to carry the same licence, so it&apos;s off by default.
+          </div>
+          <CustomCssField target="results" value={side.customCss} onChange={(customCss) => onChange({ ...side, customCss })} />
+          <SidePreview side={side} />
+        </>
       ) : side.type === "iframe" ? (
         <>
-          <Input placeholder="https://example.com/embed" value={side.url || ""}
-            onChange={(e) => onChange({ ...side, url: e.target.value })} />
+          <Input placeholder="https://… (or an Instagram post link / embed code)" value={side.url || ""}
+            onChange={(e) => {
+              // Instagram links and pasted embed code become the post's /embed/ URL.
+              const ig = instagramPostId(e.target.value)
+              onChange({ ...side, url: ig ? safeEmbedUrl(e.target.value) : e.target.value })
+            }} />
           {side.url && !safeEmbedUrl(side.url) ? (
             <div className="text-[11px] text-red-600">Must be a full https:// URL.</div>
           ) : (
-            <div className="text-[11px] text-muted-foreground">Some sites refuse to be embedded; if the preview stays blank, that site blocks iframes.</div>
+            <div className="text-[11px] text-muted-foreground">
+              Instagram posts work (paste the post link or its embed code). Many sites refuse to be embedded; if the preview stays blank or says it refused to connect, that site blocks iframes.
+            </div>
           )}
           <Input placeholder="Title for screen readers (optional)" value={side.title || ""}
             onChange={(e) => onChange({ ...side, title: e.target.value })} />
@@ -161,11 +210,7 @@ function SideEditor({ title, side, onChange }) {
               </Field>
             ) : null}
           </div>
-          <Field title="Custom CSS for the iframe (optional)"
-            hint="Applied to the frame itself, e.g. border-radius: 0; filter: grayscale(1). @keyframes blocks work too (reference them with animation-name). It can't restyle the page inside the frame.">
-            <Textarea rows={3} className="font-mono text-xs" placeholder="border-radius: 24px; box-shadow: 0 10px 40px rgb(0 0 0 / .2);"
-              value={side.customCss || ""} onChange={(e) => onChange({ ...side, customCss: e.target.value })} />
-          </Field>
+          <CustomCssField target="iframe" value={side.customCss} onChange={(customCss) => onChange({ ...side, customCss })} />
           <SidePreview side={side} />
         </>
       ) : (
@@ -313,21 +358,50 @@ export default function FeaturedEditor({ value, onChange }) {
                 <Button variant="destructive" size="sm" onClick={() => setProjects(value.projects.filter((_, j) => j !== i))}>Delete</Button>
               </div>
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              <SideEditor title="Left" side={p.left} onChange={(left) => setProject(i, { left })} />
-              <SideEditor title="Right" side={p.right} onChange={(right) => setProject(i, { right })} />
+            <div className="flex items-center gap-2 text-sm">
+              <span className={label}>Layout</span>
+              <div className="flex rounded-md border p-0.5">
+                {[["split", "Left | right"], ["full", "Full width"]].map(([key, name]) => (
+                  <button key={key} type="button" onClick={() => setProject(i, { layout: key })}
+                    className={`rounded px-3 py-1 ${(p.layout || "split") === key ? "bg-muted font-medium" : "text-muted-foreground"}`}>
+                    {name}
+                  </button>
+                ))}
+              </div>
             </div>
+            {p.layout === "full" ? (
+              <div className="space-y-3">
+                <div className="grid gap-3 md:grid-cols-2">
+                  <Field title="Title (optional)">
+                    <Input value={p.title || ""} onChange={(e) => setProject(i, { title: e.target.value })} />
+                  </Field>
+                  <Field title="Subtext (optional)">
+                    <Textarea rows={2} value={p.subtext || ""} onChange={(e) => setProject(i, { subtext: e.target.value })} />
+                  </Field>
+                </div>
+                <SideEditor title="Content (full width)" side={p.left} onChange={(left) => setProject(i, { left })} />
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                <SideEditor title="Left" side={p.left} onChange={(left) => setProject(i, { left })} />
+                <SideEditor title="Right" side={p.right} onChange={(right) => setProject(i, { right })} />
+              </div>
+            )}
             <div className="flex flex-wrap gap-4">
               <Check checked={p.dividerAbove} onChange={(v) => setProject(i, { dividerAbove: v })}>Line above</Check>
               <Check checked={p.dividerBelow} onChange={(v) => setProject(i, { dividerBelow: v })}>Line below</Check>
-              <Check checked={p.dividerBetween} onChange={(v) => setProject(i, { dividerBetween: v })}>Line between left and right</Check>
-              <label className="flex items-center gap-2 text-sm">
-                On mobile show
-                <select className={`${select} w-auto`} value={p.mobileOrder} onChange={(e) => setProject(i, { mobileOrder: e.target.value })}>
-                  <option value="left-first">left side first</option>
-                  <option value="right-first">right side first</option>
-                </select>
-              </label>
+              {p.layout !== "full" ? (
+                <>
+                  <Check checked={p.dividerBetween} onChange={(v) => setProject(i, { dividerBetween: v })}>Line between left and right</Check>
+                  <label className="flex items-center gap-2 text-sm">
+                    On mobile show
+                    <select className={`${select} w-auto`} value={p.mobileOrder} onChange={(e) => setProject(i, { mobileOrder: e.target.value })}>
+                      <option value="left-first">left side first</option>
+                      <option value="right-first">right side first</option>
+                    </select>
+                  </label>
+                </>
+              ) : null}
             </div>
             {p.button ? (
               <ButtonRow button={p.button} withVariant={false}

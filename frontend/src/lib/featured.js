@@ -17,7 +17,9 @@ export const PI = Math.PI
 
 export const ANIMATION_FNS = ["linear", "triangle", "saw", "sin", "sin2", "cos", "-cos"]
 export const BUTTON_VARIANTS = ["primary", "secondary"]
-export const SIDE_TYPES = ["text", "image", "video", "iframe"]
+export const SIDE_TYPES = ["text", "image", "video", "iframe", "openverse"]
+export const ROW_LAYOUTS = ["split", "full"]
+export const OPENVERSE_PAGE_SIZES = [12, 20, 30]
 export const EMBED_ASPECTS = ["16/9", "4/3", "1/1", "9/16", "auto"]
 
 export const DEFAULT_ANIMATION = {
@@ -63,6 +65,10 @@ export const DEFAULT_FEATURED = {
 export function newFeaturedProject() {
   return {
     id: `featured-${Date.now().toString(36)}`,
+    layout: "split",
+    // Used by the full-width layout (heading above the single content block).
+    title: "",
+    subtext: "",
     left: { type: "text", title: "Project title", subtext: "" },
     right: { type: "image", imagePath: "", imageAlt: "" },
     button: null,
@@ -115,10 +121,29 @@ function normalizeSide(s) {
   const type = oneOf(side.type, SIDE_TYPES, "text")
   if (type === "image") {
     const imagePath = str(side.imagePath)
-    return { type, imagePath: isHiddenSourceImage(imagePath) ? "" : imagePath, imageAlt: str(side.imageAlt) }
+    return {
+      type,
+      imagePath: isHiddenSourceImage(imagePath) ? "" : imagePath,
+      imageAlt: str(side.imageAlt),
+      // Same syntax as iframe custom CSS (declarations + @keyframes), applied to the <img>.
+      customCss: str(side.customCss),
+    }
   }
   if (type === "video") {
     return { type, url: str(side.url), title: str(side.title) }
+  }
+  if (type === "openverse") {
+    return {
+      type,
+      defaultQuery: str(side.defaultQuery, "psychedelic art"),
+      placeholder: str(side.placeholder, "Search openly licensed art…"),
+      pageSize: OPENVERSE_PAGE_SIZES.includes(side.pageSize) ? side.pageSize : 20,
+      // CC BY-SA requires adaptations (e.g. a filtered version) to carry the
+      // same licence, so it's excluded unless explicitly allowed.
+      includeShareAlike: bool(side.includeShareAlike, false),
+      // Applied to each result image only (declarations + @keyframes).
+      customCss: str(side.customCss),
+    }
   }
   if (type === "iframe") {
     return {
@@ -166,8 +191,19 @@ export function youtubeEmbedUrl(url) {
   return `https://www.youtube-nocookie.com/embed/${id}${start ? `?start=${start}` : ""}`
 }
 
-/** Only https URLs may be embedded. */
+/**
+ * Instagram post/reel/tv ID from a post link, an /embed/ link, or the pasted
+ * embed code (<blockquote data-instgrm-permalink="…">), or null.
+ */
+export function instagramPostId(input) {
+  const m = String(input || "").match(/instagram\.com\/(?:[A-Za-z0-9_.]+\/)?(p|reel|tv)\/([A-Za-z0-9_-]{5,40})/)
+  return m ? { kind: m[1], id: m[2] } : null
+}
+
+/** Only https URLs may be embedded. Instagram post links/embed code become the post's /embed/ page. */
 export function safeEmbedUrl(url) {
+  const ig = instagramPostId(url)
+  if (ig) return `https://www.instagram.com/${ig.kind}/${ig.id}/embed/`
   try {
     const u = new URL(String(url || "").trim())
     return u.protocol === "https:" ? u.href : null
@@ -319,6 +355,9 @@ export function normalizeFeatured(raw) {
           const proj = p && typeof p === "object" ? p : {}
           return {
             id: str(proj.id) || `featured-${i}`,
+            layout: oneOf(proj.layout, ROW_LAYOUTS, "split"),
+            title: str(proj.title),
+            subtext: str(proj.subtext),
             left: normalizeSide(proj.left),
             right: normalizeSide(proj.right),
             button: normalizeButton(proj.button),
@@ -335,4 +374,31 @@ export function normalizeFeatured(raw) {
 /** Seconds for a π-multiple setting (0 = off). */
 export function piSeconds(multiple) {
   return multiple > 0 ? multiple * PI : 0
+}
+
+// ── Openverse ─────────────────────────────────────────────────────────────
+
+const OPENVERSE_API = "https://api.openverse.org/v1/images/"
+
+/**
+ * Search URL limited to licences that allow commercial use and modification
+ * (CC BY, CC0, Public Domain Mark; CC BY-SA only when allowed). Openverse
+ * already hides results it marks as mature.
+ */
+export function openverseSearchUrl({ query, page = 1, pageSize = 20, includeShareAlike = false }) {
+  const params = new URLSearchParams({
+    q: String(query || "").trim(),
+    license: includeShareAlike ? "by,by-sa,cc0,pdm" : "by,cc0,pdm",
+    page: String(page),
+    page_size: String(pageSize),
+  })
+  return `${OPENVERSE_API}?${params}`
+}
+
+/** Human licence label, e.g. "CC BY 2.0", "CC0", "Public domain". */
+export function openverseLicenseLabel(result) {
+  const lic = String(result?.license || "").toLowerCase()
+  if (lic === "cc0") return "CC0"
+  if (lic === "pdm") return "Public domain"
+  return `CC ${lic.toUpperCase()}${result?.license_version ? ` ${result.license_version}` : ""}`
 }
